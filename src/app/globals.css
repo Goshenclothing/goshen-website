@@ -176,21 +176,310 @@ body.theme-dark {
   @apply -translate-y-[5px] scale-110;
 }
 
-/* Chatbot Custom Styles */
-.chatbot-container {
-  @apply fixed bottom-8 right-8 z-[998];
+/* Navbar Styles */
+.navbar {
+  @apply fixed top-0 left-0 w-full z-[1000] py-[var(--space-sm)] transition-[var(--transition-normal)] border-b border-[var(--color-border-light)];
+  background: rgba(10, 10, 15, 0.9);
+  backdrop-filter: blur(20px);
 }
 
-.chatbot-toggle {
-  @apply w-[60px] h-[60px] bg-[var(--gradient-gold)] border-none rounded-full cursor-pointer flex items-center justify-center shadow-[var(--shadow-card)] transition-[var(--transition-normal)];
-  background: var(--gradient-gold);
+.navbar.scrolled {
+  @apply py-[var(--space-xs)] shadow-[0_4px_30px_rgba(0, 0, 0, 0.5)];
 }
 
-.chatbot-window {
-  @apply absolute bottom-[75px] right-0 w-[350px] max-h-[500px] bg-[var(--gradient-card)] border border-[var(--color-border)] rounded-[var(--radius-md)] hidden flex-col overflow-hidden shadow-[var(--shadow-card)];
-  background: var(--gradient-card);
+.nav-container {
+  @apply flex justify-between items-center;
 }
 
-.chatbot-window.active {
-  @apply flex;
+.nav-logo {
+  @apply text-2xl font-bold tracking-[2px] text-[var(--color-primary)] font-playfair;
+}
+
+.nav-logo span {
+  @apply text-white font-normal;
+}
+
+.nav-links {
+  @apply flex gap-[var(--space-md)] list-none;
+}
+
+.nav-links a {
+  @apply text-[0.95rem] font-medium text-[var(--color-text-muted)] relative py-[var(--space-xs)];
+}
+
+.nav-links a:hover {
+  @apply text-[var(--color-primary)];
+}
+
+.theme-toggle {
+  @apply flex items-center gap-2 bg-[var(--color-bg-glass)] border border-[var(--color-border-light)] rounded-[var(--radius-lg)] px-3 py-1.5 cursor-pointer text-[var(--color-text)] text-[0.85rem] transition-[var(--transition-normal)] hover:border-[var(--color-primary)];
+}
+
+.mobile-menu-btn {
+  @apply hidden flex-col gap-[5px] bg-transparent border-none cursor-pointer p-2.5 md:hidden;
+}
+
+.mobile-menu-btn span {
+  @apply block w-[25px] h-[2px] bg-white transition-[var(--transition-fast)];
+}
+
+/* Hero Styles */
+.hero {
+  @apply min-h-screen flex items-center justify-center relative pt-20 overflow-hidden;
+}
+
+.hero::before {
+  content: '';
+  @apply absolute inset-0 pointer-events-none;
+  background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+}
+
+.hero-images {
+  @apply absolute inset-0 z-0 overflow-hidden;
+}
+
+.floating-img {
+  @apply absolute w-[200px] h-[250px] object-cover rounded-[var(--radius-md)] opacity-30 transition-[var(--transition-slow)];
+}
+
+.hero-content {
+  @apply text-center z-[1] max-w-[900px] p-[var(--space-md)];
+}
+
+.hero-badge {
+  @apply inline-block px-[var(--space-sm)] py-[var(--space-xs)] bg-[var(--color-bg-glass)] border border-[var(--color-border)] rounded-[var(--radius-lg)] text-[0.85rem] text-[var(--color-primary)] mb-[var(--space-md)] tracking-[2px] uppercase;
+}
+
+.hero h1 .highlight {
+  @apply bg-[var(--gradient-gold)] bg-clip-text text-transparent;
+  -webkit-background-clip: text;
+}
+
+.hero-description {
+  @apply text-xl mb-[var(--space-lg)] max-w-[650px] mx-auto;
+}
+
+.hero-buttons {
+  @apply flex gap-[var(--space-sm)] justify-center flex-wrap;
+}
+
+/* Products Section */
+.products-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-[var(--space-md)];
+}
+
+.product-card {
+  @apply bg-[var(--gradient-card)] rounded-[var(--radius-md)] overflow-hidden border border-[var(--color-border-light)] transition-[var(--transition-normal)] relative hover:-translate-y-2.5 hover:shadow-[var(--shadow-card), var(--shadow-glow)] hover:border-[var(--color-border)];
+}
+
+.product-image {
+  @apply relative h-[350px] overflow-hidden;
+}
+
+.product-image img {
+  @apply w-full h-full object-cover transition-[var(--transition-slow)];
+}
+
+.product-card:hover .product-image img {
+  @apply scale-110;
+}
+
+.product-tag {
+  @apply absolute top-[var(--space-sm)] right-[var(--space-sm)] bg-[var(--color-primary)] text-[var(--color-bg-dark)] px-3 py-1 rounded-[var(--radius-sm)] text-[0.75rem] font-semibold uppercase;
+}
+
+.product-info {
+  @apply p-[var(--space-sm)];
+}
+
+.product-name {
+  @apply text-xl text-white mb-[var(--space-xs)];
+}
+
+.product-description {
+  @apply text-[0.9rem] text-[var(--color-text-subtle)];
+}
+
+/* Collections Section */
+.collections {
+  background: linear-gradient(180deg, var(--color-bg-dark) 0%, #151520 100%);
+}
+
+.collections-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[var(--space-sm)];
+}
+
+.collection-item {
+  @apply relative rounded-[var(--radius-md)] overflow-hidden cursor-pointer h-[300px];
+}
+
+.collection-item img {
+  @apply w-full h-full object-cover transition-[var(--transition-slow)];
+}
+
+.collection-item:hover img {
+  @apply scale-110;
+}
+
+.collection-overlay {
+  @apply absolute inset-0 flex flex-col justify-end p-[var(--space-md)] transition-[var(--transition-normal)];
+  background: linear-gradient(transparent 50%, rgba(0, 0, 0, 0.8));
+}
+
+.collection-item:hover .collection-overlay {
+  background: linear-gradient(transparent 30%, rgba(0, 0, 0, 0.9));
+}
+
+.collection-title {
+  @apply text-2xl text-white mb-1;
+}
+
+.collection-count {
+  @apply text-[var(--color-primary)] text-[0.9rem];
+}
+
+/* Reviews Section */
+.reviews-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[var(--space-md)];
+}
+
+.review-card {
+  @apply bg-[var(--color-bg-glass)] border border-[var(--color-border-light)] rounded-[var(--radius-md)] p-[var(--space-md)] transition-[var(--transition-normal)] hover:border-[var(--color-border)] hover:-translate-y-1;
+  backdrop-filter: blur(10px);
+}
+
+.review-stars {
+  @apply flex gap-1 mb-[var(--space-sm)];
+}
+
+.star {
+  @apply text-[var(--color-primary)] text-xl;
+}
+
+.review-text {
+  @apply text-lg italic mb-[var(--space-md)];
+  line-height: 1.7;
+}
+
+.review-author {
+  @apply flex items-center gap-[var(--space-sm)];
+}
+
+.author-avatar {
+  @apply w-[50px] h-[50px] rounded-full bg-[var(--gradient-gold)] flex items-center justify-center font-bold text-[var(--color-bg-dark)] text-xl;
+}
+
+.author-info h4 {
+  @apply text-white font-semibold text-base;
+}
+
+.author-info span {
+  @apply text-[var(--color-text-subtle)] text-[0.85rem];
+}
+
+/* Contact Section */
+.social-links {
+  @apply flex justify-center gap-[var(--space-md)] flex-wrap;
+}
+
+.social-link {
+  @apply flex items-center justify-center w-[60px] h-[60px] bg-[var(--color-bg-glass)] border border-[var(--color-border-light)] rounded-full transition-[var(--transition-normal)] hover:bg-[var(--color-primary)] hover:border-[var(--color-primary)] hover:-translate-y-1 hover:scale-110;
+}
+
+.social-link svg {
+  @apply w-7 h-7 fill-white transition-[var(--transition-fast)];
+}
+
+.social-link:hover svg {
+  @apply fill-[var(--color-bg-dark)];
+}
+
+/* Footer Section */
+.footer {
+  @apply bg-[rgba(5, 5, 10, 0.9)] py-[var(--space-lg)] border-t border-[var(--color-border-light)];
+}
+
+.footer-content {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[var(--space-lg)] mb-[var(--space-lg)];
+}
+
+.footer-logo {
+  @apply text-2xl text-[var(--color-primary)] mb-[var(--space-sm)] font-playfair;
+}
+
+.footer-section h4 {
+  @apply text-white text-lg mb-[var(--space-sm)] font-playfair;
+}
+
+.footer-links {
+  @apply list-none;
+}
+
+.footer-links li {
+  @apply mb-2;
+}
+
+.footer-links a {
+  @apply text-[var(--color-text-muted)] text-[0.95rem] hover:text-[var(--color-primary)];
+}
+
+.footer-bottom {
+  @apply text-center pt-[var(--space-md)] border-t border-[var(--color-border-light)] text-[0.9rem];
+}
+
+/* Chatbot Styles Header */
+.chatbot-header {
+  @apply bg-[var(--gradient-gold)] text-[var(--color-bg-dark)] p-[15px] font-bold flex justify-between items-center;
+}
+
+.chatbot-messages {
+  @apply flex-1 overflow-y-auto p-[var(--space-sm)] max-h-[350px];
+}
+
+.chat-message {
+  @apply mb-3 px-3.5 py-2.5 rounded-[var(--radius-sm)] max-w-[85%] text-[0.9rem];
+  line-height: 1.4;
+}
+
+.chat-message.bot {
+  @apply bg-[var(--color-bg-glass)] border border-[var(--color-border-light)] text-white;
+}
+
+.chat-message.user {
+  @apply bg-[var(--color-primary)] text-[var(--color-bg-dark)] ml-auto;
+}
+
+.chatbot-input-container {
+  @apply flex border-t border-[var(--color-border-light)];
+}
+
+.chatbot-input {
+  @apply flex-1 p-3 border-none bg-[var(--color-bg-glass)] text-white text-[0.9rem];
+}
+
+.chatbot-send {
+  @apply bg-[var(--color-primary)] border-none px-4 py-3 cursor-pointer;
+}
+
+.chatbot-send svg {
+  @apply w-5 h-5 fill-[var(--color-bg-dark)];
+}
+
+.chatbot-close {
+  @apply bg-none border-none text-2xl cursor-pointer;
+}
+
+/* Responsive Overrides */
+@media (max-width: 768px) {
+  .nav-links {
+    @apply hidden absolute top-full left-0 w-full bg-[rgba(10, 10, 15, 0.98)] flex-col p-[var(--space-md)] gap-[var(--space-sm)] border-t border-[var(--color-border-light)];
+  }
+
+  .nav-links.active {
+    @apply flex;
+  }
+
+  .mobile-menu-btn {
+    @apply flex;
+  }
 }

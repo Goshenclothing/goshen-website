@@ -17,6 +17,7 @@ import {
 import Link from 'next/link';
 import AdminAIChat from '@/components/AdminAIChat';
 import ProductManager from '@/components/ProductManager';
+import CollectionManager from '@/components/CollectionManager';
 
 export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState('overview');
@@ -105,13 +106,7 @@ export default function AdminDashboard() {
 
                         {activeTab === 'products' && <ProductManager />}
 
-                        {activeTab === 'collections' && (
-                            <div className="text-center py-20 text-[var(--color-text-subtle)]">
-                                <ImageIcon size={48} className="mx-auto mb-4 opacity-20" />
-                                <p>Collection management system is linked to Lookbook pages.</p>
-                                <Link href="/#collections" className="text-[var(--color-primary)] hover:underline mt-2 inline-block">View Live Collections</Link>
-                            </div>
-                        )}
+                        {activeTab === 'collections' && <CollectionManager />}
                     </motion.div>
                 </AnimatePresence>
             </main>

@@ -15,6 +15,7 @@ import {
     Users
 } from 'lucide-react';
 import Link from 'next/link';
+import AdminAIChat from '@/components/AdminAIChat';
 
 export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState('overview');
@@ -43,8 +44,8 @@ export default function AdminDashboard() {
                             key={item.id}
                             onClick={() => setActiveTab(item.id)}
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === item.id
-                                    ? 'bg-[var(--gradient-gold)] text-[var(--color-bg-dark)] shadow-lg'
-                                    : 'text-[var(--color-text-subtle)] hover:bg-[var(--color-bg-glass)] hover:text-white'
+                                ? 'bg-[var(--gradient-gold)] text-[var(--color-bg-dark)] shadow-lg'
+                                : 'text-[var(--color-text-subtle)] hover:bg-[var(--color-bg-glass)] hover:text-white'
                                 }`}
                         >
                             <item.icon size={20} />
@@ -104,39 +105,7 @@ export default function AdminDashboard() {
                             </div>
                         )}
 
-                        {activeTab === 'ai-agent' && (
-                            <div className="bg-[var(--gradient-card)] border border-[var(--color-border)] rounded-[var(--radius-md)] overflow-hidden">
-                                <div className="p-8 border-b border-[var(--color-border)] bg-[var(--color-bg-glass)]">
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <Sparkles className="text-[var(--color-primary)]" />
-                                        <h3 className="text-xl font-bold">Goshen AI Admin Agent</h3>
-                                    </div>
-                                    <p className="text-[var(--color-text-subtle)]">
-                                        Use natural language to manage your store. I can add products, update prices, or change descriptions.
-                                    </p>
-                                </div>
-                                <div className="h-[400px] p-6 flex flex-col justify-end">
-                                    <div className="space-y-4 mb-6">
-                                        <div className="bg-[var(--color-bg-dark)] p-4 rounded-xl border border-[var(--color-border)] max-w-lg">
-                                            <p className="text-sm">"I need to add a new Red Silk Kimono to the Evening Glamour collection."</p>
-                                        </div>
-                                        <div className="bg-[var(--gradient-gold)] text-[var(--color-bg-dark)] p-4 rounded-xl self-end max-w-lg ml-auto">
-                                            <p className="text-sm font-semibold">"Understood. I've prepared a draft for the 'Red Silk Kimono'. Would you like to review the details or publish it immediately?"</p>
-                                        </div>
-                                    </div>
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            placeholder="Type a command (e.g., 'Discount all Summer items by 10%')"
-                                            className="w-full bg-[var(--color-bg-dark)] border border-[var(--color-border)] rounded-xl py-4 px-6 focus:outline-none focus:border-[var(--color-primary)]"
-                                        />
-                                        <button className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)]">
-                                            <Sparkles size={24} />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+                        {activeTab === 'ai-agent' && <AdminAIChat />}
 
                         {activeTab === 'products' && (
                             <div className="bg-[var(--gradient-card)] border border-[var(--color-border)] rounded-[var(--radius-md)] overflow-hidden">

@@ -275,8 +275,52 @@ body.theme-dark {
 }
 
 .floating-img {
-  @apply absolute w-[200px] h-[250px] object-cover opacity-30 transition-[var(--transition-slow)];
+  @apply absolute w-[180px] h-[240px] object-cover opacity-80 transition-[var(--transition-slow)] shadow-2xl;
   border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-light);
+}
+
+.floating-img:hover {
+  @apply opacity-100 scale-105 z-10;
+  border-color: var(--color-primary);
+}
+
+.img-tl {
+  top: 15%;
+  left: 5%;
+  transform: rotate(-5deg);
+}
+
+.img-bl {
+  bottom: 15%;
+  left: 8%;
+  transform: rotate(3deg);
+}
+
+.img-tr {
+  top: 12%;
+  right: 5%;
+  transform: rotate(4deg);
+}
+
+.img-br {
+  bottom: 10%;
+  right: 7%;
+  transform: rotate(-6deg);
+}
+
+@media (max-width: 1024px) {
+  .floating-img {
+    width: 140px;
+    height: 190px;
+    opacity: 0.5;
+  }
+}
+
+@media (max-width: 768px) {
+  .floating-img {
+    display: none;
+  }
 }
 
 .hero-content {

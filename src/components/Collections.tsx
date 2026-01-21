@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 const COLLECTIONS = [
     {
@@ -49,30 +50,38 @@ export default function Collections() {
 
                 <div className="collections-grid">
                     {COLLECTIONS.map((c, i) => (
-                        <motion.div
+                        <Link
                             key={i}
-                            className="collection-item"
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: i * 0.1, duration: 0.5 }}
-                            whileHover={{ y: -10 }}
+                            href={`/collections/${i}`}
+                            className="block"
                         >
-                            <EditableImage
-                                id={`collection-img-${i}`}
-                                defaultSrc={`/images/goshen/${c.image}`}
-                                alt={c.title}
-                                className="w-full h-full object-cover"
-                            />
-                            <div className="collection-overlay">
-                                <h3 className="collection-title">
-                                    <EditableText id={`collection-title-${i}`} defaultValue={c.title} />
-                                </h3>
-                                <div className="collection-count">
-                                    <EditableText id={`collection-count-${i}`} defaultValue={c.count} />
+                            <motion.div
+                                className="collection-item"
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: i * 0.1, duration: 0.5 }}
+                                whileHover={{ y: -10 }}
+                            >
+                                <EditableImage
+                                    id={`collection-img-${i}`}
+                                    defaultSrc={`/images/goshen/${c.image}`}
+                                    alt={c.title}
+                                    className="w-full h-full object-cover"
+                                />
+                                <div className="collection-overlay">
+                                    <h3 className="collection-title">
+                                        <EditableText id={`collection-title-${i}`} defaultValue={c.title} />
+                                    </h3>
+                                    <div className="collection-count">
+                                        <EditableText id={`collection-count-${i}`} defaultValue={c.count} />
+                                    </div>
+                                    <span className="mt-4 text-xs font-bold tracking-widest uppercase text-[var(--color-primary)] opacity-0 group-hover:opacity-100 transition-opacity">
+                                        View Lookbook
+                                    </span>
                                 </div>
-                            </div>
-                        </motion.div>
+                            </motion.div>
+                        </Link>
                     ))}
                 </div>
             </div>

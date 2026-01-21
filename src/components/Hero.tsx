@@ -2,10 +2,10 @@ import EditableText from './EditableText';
 import EditableImage from './EditableImage';
 
 const HERO_IMAGES = [
-    'WhatsApp Image 2025-12-30 at 12.12.45.jpeg',
-    'WhatsApp Image 2025-12-30 at 12.12.4jj.jpeg',
-    'WhatsApp Image 2025-12-30 at 12.12.46.jpeg',
-    'WhatsApp Image 2025-12-30 at 12.12.47.jpeg'
+    { name: 'WhatsApp Image 2025-12-30 at 12.12.45.jpeg', class: 'img-tl' },
+    { name: 'WhatsApp Image 2025-12-30 at 12.12.4jj.jpeg', class: 'img-bl' },
+    { name: 'WhatsApp Image 2025-12-30 at 12.12.46.jpeg', class: 'img-tr' },
+    { name: 'WhatsApp Image 2025-12-30 at 12.12.47.jpeg', class: 'img-br' }
 ];
 
 export default function Hero() {
@@ -15,7 +15,7 @@ export default function Hero() {
                 {HERO_IMAGES.map((img, i) => (
                     <motion.div
                         key={i}
-                        className="floating-img"
+                        className={`floating-img ${img.class}`}
                         initial={{ opacity: 0, scale: 0.8, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         transition={{
@@ -26,7 +26,7 @@ export default function Hero() {
                     >
                         <EditableImage
                             id={`hero-img-${i}`}
-                            defaultSrc={`/images/goshen/${img}`}
+                            defaultSrc={`/images/goshen/${img.name}`}
                             alt="African Fashion"
                             className="w-full h-full object-cover"
                         />

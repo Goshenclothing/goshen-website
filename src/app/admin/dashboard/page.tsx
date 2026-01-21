@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import AdminAIChat from '@/components/AdminAIChat';
+import ProductManager from '@/components/ProductManager';
 
 export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState('overview');
@@ -55,10 +56,10 @@ export default function AdminDashboard() {
                 </nav>
 
                 <div className="mt-auto pt-10">
-                    <Link href="/" className="flex items-center gap-3 px-4 py-3 text-[var(--color-text-subtle)] hover:text-red-400 transition-colors">
+                    <button onClick={() => window.location.href = '/'} className="flex items-center gap-3 px-4 py-3 text-[var(--color-text-subtle)] hover:text-red-400 transition-colors w-full">
                         <LogOut size={20} />
-                        <span className="font-semibold text-sm text-[var(--color-bg-dark)]">Sign Out</span>
-                    </Link>
+                        <span className="font-semibold text-sm">Sign Out</span>
+                    </button>
                 </div>
             </aside>
 
@@ -68,11 +69,6 @@ export default function AdminDashboard() {
                     <div>
                         <h2 className="text-3xl font-bold font-playfair capitalize">{activeTab.replace('-', ' ')}</h2>
                         <p className="text-[var(--color-text-subtle)]">Welcome back, Goshen Admin</p>
-                    </div>
-                    <div className="flex gap-4">
-                        <button className="btn btn-secondary py-2 px-4 text-sm flex items-center gap-2">
-                            <Plus size={18} /> Add New Product
-                        </button>
                     </div>
                 </header>
 
@@ -107,38 +103,13 @@ export default function AdminDashboard() {
 
                         {activeTab === 'ai-agent' && <AdminAIChat />}
 
-                        {activeTab === 'products' && (
-                            <div className="bg-[var(--gradient-card)] border border-[var(--color-border)] rounded-[var(--radius-md)] overflow-hidden">
-                                <table className="w-full text-left">
-                                    <thead className="bg-[var(--color-bg-glass)] border-b border-[var(--color-border)]">
-                                        <tr>
-                                            <th className="px-6 py-4 font-semibold">Image</th>
-                                            <th className="px-6 py-4 font-semibold">Product Name</th>
-                                            <th className="px-6 py-4 font-semibold">Collection</th>
-                                            <th className="px-6 py-4 font-semibold">Tag</th>
-                                            <th className="px-6 py-4 font-semibold text-right">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-[var(--color-border)]">
-                                        {[1, 2, 3, 4].map((id) => (
-                                            <tr key={id} className="hover:bg-[var(--color-bg-glass)] transition-colors">
-                                                <td className="px-6 py-4">
-                                                    <div className="w-12 h-12 bg-[var(--color-bg-dark)] rounded overflow-hidden border border-[var(--color-border)]">
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 font-medium text-white">Example Kimono Item {id}</td>
-                                                <td className="px-6 py-4 text-[var(--color-text-subtle)] text-sm">Signature Prints</td>
-                                                <td className="px-6 py-4">
-                                                    <span className="px-2 py-1 bg-blue-500/10 text-blue-400 text-xs rounded border border-blue-500/20">New</span>
-                                                </td>
-                                                <td className="px-6 py-4 text-right">
-                                                    <button className="text-[var(--color-text-subtle)] hover:text-white mr-3 text-sm">Edit</button>
-                                                    <button className="text-red-400/70 hover:text-red-400 text-sm">Delete</button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                        {activeTab === 'products' && <ProductManager />}
+
+                        {activeTab === 'collections' && (
+                            <div className="text-center py-20 text-[var(--color-text-subtle)]">
+                                <ImageIcon size={48} className="mx-auto mb-4 opacity-20" />
+                                <p>Collection management system is linked to Lookbook pages.</p>
+                                <Link href="/#collections" className="text-[var(--color-primary)] hover:underline mt-2 inline-block">View Live Collections</Link>
                             </div>
                         )}
                     </motion.div>

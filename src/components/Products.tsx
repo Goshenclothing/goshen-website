@@ -1,3 +1,7 @@
+'use client';
+
+import { motion } from 'framer-motion';
+
 const PRODUCTS = [
     {
         name: "Vibrant Heritage Kimono",
@@ -45,21 +49,47 @@ const PRODUCTS = [
     }
 ];
 
+const container = {
+    hidden: { opacity: 0 },
+    show: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1
+        }
+    }
+};
+
+const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
+};
+
 export default function Products() {
     return (
         <section className="products" id="products">
             <div className="container">
-                <div className="section-header">
+                <motion.div
+                    className="section-header"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                >
                     <h2>Our Collection</h2>
                     <p>
                         Each piece is uniquely crafted, blending traditional African prints with contemporary styling
                         for the modern fashion enthusiast.
                     </p>
-                </div>
+                </motion.div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-[var(--space-md)]">
+                <motion.div
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-[var(--space-md)]"
+                    variants={container}
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={{ once: true, margin: "-100px" }}
+                >
                     {PRODUCTS.map((product, i) => (
-                        <div key={i} className="product-card">
+                        <motion.div key={i} className="product-card" variants={item}>
                             <div className="product-image">
                                 <img
                                     src={`/images/goshen/${product.image}`}
@@ -71,9 +101,9 @@ export default function Products() {
                                 <h3 className="product-name">{product.name}</h3>
                                 <p className="product-description">{product.description}</p>
                             </div>
-                        </div>
+                        </motion.div>
                     ))}
-                </div>
+                </motion.div>
             </div>
         </section>
     );

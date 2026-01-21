@@ -1,3 +1,7 @@
+'use client';
+
+import { motion } from 'framer-motion';
+
 const REVIEWS = [
     {
         text: "The quality of my kimono is absolutely stunning! The colors are vibrant and the craftsmanship is exceptional. I receive compliments every time I wear it.",
@@ -29,14 +33,26 @@ export default function Reviews() {
     return (
         <section className="reviews" id="reviews">
             <div className="container">
-                <div className="section-header">
+                <motion.div
+                    className="section-header"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                >
                     <h2>What Our Customers Say</h2>
                     <p>Real stories from our valued customers who have experienced the Goshen Clothing difference.</p>
-                </div>
+                </motion.div>
 
                 <div className="reviews-grid">
                     {REVIEWS.map((review, i) => (
-                        <div key={i} className="review-card">
+                        <motion.div
+                            key={i}
+                            className="review-card"
+                            initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: i * 0.1, duration: 0.6 }}
+                        >
                             <div className="review-stars">
                                 {[...Array(5)].map((_, j) => (
                                     <span key={j} className="star">★</span>
@@ -50,7 +66,7 @@ export default function Reviews() {
                                     <span>{review.location}</span>
                                 </div>
                             </div>
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
             </div>

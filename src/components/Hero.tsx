@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 
 const HERO_IMAGES = [
     'WhatsApp Image 2025-12-30 at 12.12.45.jpeg',
@@ -12,27 +15,66 @@ export default function Hero() {
         <section className="hero" id="home">
             <div className="hero-images">
                 {HERO_IMAGES.map((img, i) => (
-                    <img
+                    <motion.img
                         key={i}
                         src={`/images/goshen/${img}`}
                         alt="African Fashion"
                         className="floating-img"
+                        initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        transition={{
+                            duration: 0.8,
+                            delay: i * 0.2,
+                            ease: [0.16, 1, 0.3, 1]
+                        }}
                     />
                 ))}
             </div>
 
-            <div className="hero-content">
-                <span className="hero-badge">✨ Handcrafted in Ghana</span>
-                <h1>Embrace the <span className="highlight">Beauty</span> of African Fashion</h1>
-                <p className="hero-description">
+            <motion.div
+                className="hero-content"
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 1, ease: 'easeOut' }}
+            >
+                <motion.span
+                    className="hero-badge"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                >
+                    ✨ Handcrafted in Ghana
+                </motion.span>
+
+                <motion.h1
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.7 }}
+                >
+                    Embrace the <span className="highlight">Beauty</span> of African Fashion
+                </motion.h1>
+
+                <motion.p
+                    className="hero-description"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.9 }}
+                >
                     Discover our exquisite collection of handcrafted African kimonos and contemporary designs.
                     Each piece tells a story of heritage, elegance, and modern sophistication.
-                </p>
-                <div className="hero-buttons">
+                </motion.p>
+
+                <motion.div
+                    className="hero-buttons"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.1 }}
+                >
                     <Link href="#products" className="btn btn-primary">Explore Collection</Link>
                     <Link href="#contact" className="btn btn-secondary">Visit Showroom</Link>
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
         </section>
     );
 }

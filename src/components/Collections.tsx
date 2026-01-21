@@ -1,3 +1,7 @@
+'use client';
+
+import { motion } from 'framer-motion';
+
 const COLLECTIONS = [
     {
         title: "Casual Elegance",
@@ -30,20 +34,33 @@ export default function Collections() {
     return (
         <section className="collections" id="collections">
             <div className="container">
-                <div className="section-header">
+                <motion.div
+                    className="section-header"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                >
                     <h2>Explore Our Collections</h2>
                     <p>Browse through our curated lookbooks featuring different styles and occasions.</p>
-                </div>
+                </motion.div>
 
                 <div className="collections-grid">
                     {COLLECTIONS.map((c, i) => (
-                        <div key={i} className="collection-item">
+                        <motion.div
+                            key={i}
+                            className="collection-item"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: i * 0.1, duration: 0.5 }}
+                            whileHover={{ y: -10 }}
+                        >
                             <img src={`/images/goshen/${c.image}`} alt={c.title} />
                             <div className="collection-overlay">
                                 <h3 className="collection-title">{c.title}</h3>
                                 <span className="collection-count">{c.count}</span>
                             </div>
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
             </div>

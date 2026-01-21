@@ -1,12 +1,18 @@
+import EditableText from './EditableText';
+
 export default function Contact() {
     return (
         <section className="contact" id="contact">
             <div className="container">
                 <div className="contact-content">
-                    <h2>Connect With Us</h2>
-                    <p className="contact-description">
-                        Visit our showroom or reach out on social media. We'd love to help you find your perfect piece.
-                    </p>
+                    <h2><EditableText id="contact-title" defaultValue="Connect With Us" /></h2>
+                    <div className="contact-description">
+                        <EditableText
+                            id="contact-desc"
+                            tagName="p"
+                            defaultValue="Visit our showroom or reach out on social media. We'd love to help you find your perfect piece."
+                        />
+                    </div>
 
                     <div className="social-links">
                         <a href="https://web.facebook.com/profile.php?id=100063884680815" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="Facebook">

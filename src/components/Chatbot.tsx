@@ -1,8 +1,7 @@
-'use client';
-
-import { useState, useRef, useEffect } from 'react';
+import { useAdmin } from '@/context/AdminContext';
 
 export default function Chatbot() {
+    const { isAdminMode } = useAdmin();
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([
         { role: 'bot', text: "Hello! I'm your Goshen assistant. Ask me about our collections, luxury kimonos, or styling advice." }
@@ -27,6 +26,14 @@ export default function Chatbot() {
         setInput('');
         setIsLoading(true);
 
+        // Admin command shortcuts in chat
+        if (isAdminMode && userMsg.toLowerCase() === 'reset content') {
+            localStorage.clear();
+            setMessages(prev => [...prev, { role: 'bot', text: "Content reset! Please refresh the page. 🔄" }]);
+            setIsLoading(false);
+            return;
+        }
+
         try {
             const response = await fetch('/api/chat', {
                 method: 'POST',
@@ -42,9 +49,15 @@ export default function Chatbot() {
 
             setMessages(prev => [...prev, { role: 'bot', text: data.text }]);
         } catch (error) {
+            let errorText = "I'm experiencing a temporary connection issue. Please make sure the API key is configured or try again in a moment! ✨";
+
+            if (isAdminMode) {
+                errorText = "⚠️ ADMIN TIP: The AI is failing. This usually means the 'GEMINI_API_KEY' is missing from Netlify's Environment Variables. Please add it in Netlify settings! 🔑";
+            }
+
             setMessages(prev => [...prev, {
                 role: 'bot',
-                text: "I'm experiencing a temporary connection issue. Please make sure the API key is configured or try again in a moment! ✨"
+                text: errorText
             }]);
         } finally {
             setIsLoading(false);

@@ -1,7 +1,5 @@
-'use client';
-
-import Link from 'next/link';
-import { motion } from 'framer-motion';
+import EditableText from './EditableText';
+import EditableImage from './EditableImage';
 
 const HERO_IMAGES = [
     'WhatsApp Image 2025-12-30 at 12.12.45.jpeg',
@@ -15,10 +13,8 @@ export default function Hero() {
         <section className="hero" id="home">
             <div className="hero-images">
                 {HERO_IMAGES.map((img, i) => (
-                    <motion.img
+                    <motion.div
                         key={i}
-                        src={`/images/goshen/${img}`}
-                        alt="African Fashion"
                         className="floating-img"
                         initial={{ opacity: 0, scale: 0.8, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -27,7 +23,14 @@ export default function Hero() {
                             delay: i * 0.2,
                             ease: [0.16, 1, 0.3, 1] as any
                         }}
-                    />
+                    >
+                        <EditableImage
+                            id={`hero-img-${i}`}
+                            defaultSrc={`/images/goshen/${img}`}
+                            alt="African Fashion"
+                            className="w-full h-full object-cover"
+                        />
+                    </motion.div>
                 ))}
             </div>
 
@@ -44,7 +47,7 @@ export default function Hero() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
                 >
-                    ✨ Handcrafted in Ghana
+                    <EditableText id="hero-badge" defaultValue="✨ Handcrafted in Ghana" />
                 </motion.span>
 
                 <motion.h1
@@ -52,18 +55,21 @@ export default function Hero() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.7 }}
                 >
-                    Embrace the <span className="highlight">Beauty</span> of African Fashion
+                    <EditableText id="hero-title" defaultValue='Embrace the <span class="highlight">Beauty</span> of African Fashion' />
                 </motion.h1>
 
-                <motion.p
+                <motion.div
                     className="hero-description"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.9 }}
                 >
-                    Discover our exquisite collection of handcrafted African kimonos and contemporary designs.
-                    Each piece tells a story of heritage, elegance, and modern sophistication.
-                </motion.p>
+                    <EditableText
+                        id="hero-desc"
+                        tagName="p"
+                        defaultValue="Discover our exquisite collection of handcrafted African kimonos and contemporary designs. Each piece tells a story of heritage, elegance, and modern sophistication."
+                    />
+                </motion.div>
 
                 <motion.div
                     className="hero-buttons"

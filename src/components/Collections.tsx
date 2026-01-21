@@ -30,6 +30,9 @@ const COLLECTIONS = [
     }
 ];
 
+import EditableText from './EditableText';
+import EditableImage from './EditableImage';
+
 export default function Collections() {
     return (
         <section className="collections" id="collections">
@@ -40,8 +43,8 @@ export default function Collections() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                 >
-                    <h2>Explore Our Collections</h2>
-                    <p>Browse through our curated lookbooks featuring different styles and occasions.</p>
+                    <EditableText id="collections-title" tagName="h2" defaultValue="Explore Our Collections" />
+                    <EditableText id="collections-subtitle" tagName="p" defaultValue="Browse through our curated lookbooks featuring different styles and occasions." />
                 </motion.div>
 
                 <div className="collections-grid">
@@ -55,10 +58,19 @@ export default function Collections() {
                             transition={{ delay: i * 0.1, duration: 0.5 }}
                             whileHover={{ y: -10 }}
                         >
-                            <img src={`/images/goshen/${c.image}`} alt={c.title} />
+                            <EditableImage
+                                id={`collection-img-${i}`}
+                                defaultSrc={`/images/goshen/${c.image}`}
+                                alt={c.title}
+                                className="w-full h-full object-cover"
+                            />
                             <div className="collection-overlay">
-                                <h3 className="collection-title">{c.title}</h3>
-                                <span className="collection-count">{c.count}</span>
+                                <h3 className="collection-title">
+                                    <EditableText id={`collection-title-${i}`} defaultValue={c.title} />
+                                </h3>
+                                <div className="collection-count">
+                                    <EditableText id={`collection-count-${i}`} defaultValue={c.count} />
+                                </div>
                             </div>
                         </motion.div>
                     ))}

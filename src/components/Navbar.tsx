@@ -1,12 +1,26 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useAdmin } from '@/context/AdminContext';
 
 export default function Navbar() {
+    const { isAdminMode, setIsAdminMode } = useAdmin();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [theme, setTheme] = useState<'default' | 'light' | 'dark'>('default');
+    const [logoClicks, setLogoClicks] = useState(0);
+
+    const handleLogoClick = (e: React.MouseEvent) => {
+        setLogoClicks(prev => {
+            const next = prev + 1;
+            if (next >= 5) {
+                e.preventDefault();
+                const newState = !isAdminMode;
+                setIsAdminMode(newState);
+                localStorage.setItem('goshen-admin-mode', String(newState));
+                return 0;
+            }
+            return next;
+        });
+        setTimeout(() => setLogoClicks(0), 2000);
+    };
 
     useEffect(() => {
         const handleScroll = () => {
@@ -42,7 +56,7 @@ export default function Navbar() {
     return (
         <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
             <div className="container nav-container">
-                <Link href="/" className="nav-logo">
+                <Link href="/" className="nav-logo" onClick={handleLogoClick}>
                     GOSHEN <span>Clothing</span>
                 </Link>
 
@@ -52,6 +66,9 @@ export default function Navbar() {
                     <li><Link href="#collections" onClick={() => setIsMobileMenuOpen(false)}>Collections</Link></li>
                     <li><Link href="#reviews" onClick={() => setIsMobileMenuOpen(false)}>Reviews</Link></li>
                     <li><Link href="#contact" onClick={() => setIsMobileMenuOpen(false)}>Contact</Link></li>
+                    {isAdminMode && (
+                        <li><Link href="/admin/dashboard" className="text-[var(--color-primary)] font-bold">Dashboard</Link></li>
+                    )}
                 </ul>
 
                 <button

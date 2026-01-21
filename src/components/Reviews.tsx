@@ -29,6 +29,8 @@ const REVIEWS = [
     }
 ];
 
+import EditableText from './EditableText';
+
 export default function Reviews() {
     return (
         <section className="reviews" id="reviews">
@@ -39,8 +41,8 @@ export default function Reviews() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                 >
-                    <h2>What Our Customers Say</h2>
-                    <p>Real stories from our valued customers who have experienced the Goshen Clothing difference.</p>
+                    <EditableText id="reviews-title" tagName="h2" defaultValue="What Our Customers Say" />
+                    <EditableText id="reviews-subtitle" tagName="p" defaultValue="Real stories from our valued customers who have experienced the Goshen Clothing difference." />
                 </motion.div>
 
                 <div className="reviews-grid">
@@ -58,12 +60,14 @@ export default function Reviews() {
                                     <span key={j} className="star">★</span>
                                 ))}
                             </div>
-                            <p className="review-text">"{review.text}"</p>
+                            <div className="review-text">
+                                <EditableText id={`review-text-${i}`} defaultValue={`"${review.text}"`} />
+                            </div>
                             <div className="review-author">
                                 <div className="author-avatar">{review.initial}</div>
                                 <div className="author-info">
-                                    <h4>{review.author}</h4>
-                                    <span>{review.location}</span>
+                                    <h4><EditableText id={`review-author-${i}`} defaultValue={review.author} /></h4>
+                                    <span><EditableText id={`review-location-${i}`} defaultValue={review.location} /></span>
                                 </div>
                             </div>
                         </motion.div>

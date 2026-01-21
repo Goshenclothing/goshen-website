@@ -64,6 +64,9 @@ const item = {
     show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as any } }
 };
 
+import EditableText from './EditableText';
+import EditableImage from './EditableImage';
+
 export default function Products() {
     return (
         <section className="products" id="products">
@@ -74,11 +77,12 @@ export default function Products() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                 >
-                    <h2>Our Collection</h2>
-                    <p>
-                        Each piece is uniquely crafted, blending traditional African prints with contemporary styling
-                        for the modern fashion enthusiast.
-                    </p>
+                    <EditableText id="products-title" tagName="h2" defaultValue="Our Collection" />
+                    <EditableText
+                        id="products-subtitle"
+                        tagName="p"
+                        defaultValue="Each piece is uniquely crafted, blending traditional African prints with contemporary styling for the modern fashion enthusiast."
+                    />
                 </motion.div>
 
                 <motion.div
@@ -91,15 +95,29 @@ export default function Products() {
                     {PRODUCTS.map((product, i) => (
                         <motion.div key={i} className="product-card" variants={item}>
                             <div className="product-image">
-                                <img
-                                    src={`/images/goshen/${product.image}`}
+                                <EditableImage
+                                    id={`product-img-${i}`}
+                                    defaultSrc={`/images/goshen/${product.image}`}
                                     alt={product.name}
+                                    className="w-full h-full object-cover"
                                 />
-                                {product.tag && <span className="product-tag">{product.tag}</span>}
+                                {product.tag && (
+                                    <span className="product-tag">
+                                        <EditableText id={`product-tag-${i}`} defaultValue={product.tag} />
+                                    </span>
+                                )}
                             </div>
                             <div className="product-info">
-                                <h3 className="product-name">{product.name}</h3>
-                                <p className="product-description">{product.description}</p>
+                                <h3 className="product-name">
+                                    <EditableText id={`product-name-${i}`} defaultValue={product.name} />
+                                </h3>
+                                <div className="product-description">
+                                    <EditableText
+                                        id={`product-desc-${i}`}
+                                        tagName="p"
+                                        defaultValue={product.description}
+                                    />
+                                </div>
                             </div>
                         </motion.div>
                     ))}

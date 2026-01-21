@@ -1,53 +1,11 @@
 'use client';
 
 import { motion } from 'framer-motion';
-
-const PRODUCTS = [
-    {
-        name: "Vibrant Heritage Kimono",
-        description: "Bold red and green African print with geometric patterns",
-        image: "WhatsApp Image 2025-12-30 at 12.12.45.jpeg",
-        tag: "New"
-    },
-    {
-        name: "Sunset Blaze Kimono",
-        description: "Striking red batik design with intricate circle motifs",
-        image: "WhatsApp Image 2025-12-30 at 12.12.46.jpeg",
-        tag: "Popular"
-    },
-    {
-        name: "Rainbow Fusion Kimono",
-        description: "Multi-colored traditional print in vibrant earthy tones",
-        image: "WhatsApp Image 2025-12-30 at 12.12.4jj.jpeg"
-    },
-    {
-        name: "Classic XO Print Kimono",
-        description: "Black and red XO pattern with elegant striped borders",
-        image: "WhatsApp Image 2025-12-30 at 12.12.411.jpeg",
-        tag: "Bestseller"
-    },
-    {
-        name: "Ocean Wave Kimono",
-        description: "Serene blue and white wave patterns with floral accents",
-        image: "WhatsApp Image 2025-12-30 at 12.12.47.jpeg"
-    },
-    {
-        name: "Royal Purple Elegance",
-        description: "Regal purple design with traditional African motifs",
-        image: "WhatsApp Image 2025-12-30 at 12.12.48jnk.jpeg",
-        tag: "Limited"
-    },
-    {
-        name: "Tropical Garden Kimono",
-        description: "Lush green and gold botanical print design",
-        image: "WhatsApp Image 2025-12-30 at 12.12.4j.jpeg"
-    },
-    {
-        name: "Earthy Tribal Kimono",
-        description: "Warm earth tones with classic tribal patterns",
-        image: "WhatsApp Image 2025-12-30 at 12.12.43.jpeg"
-    }
-];
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+import EditableText from './EditableText';
+import EditableImage from './EditableImage';
+import { Loader2 } from 'lucide-react';
 
 const container = {
     hidden: { opacity: 0 },
@@ -64,10 +22,31 @@ const item = {
     show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as any } }
 };
 
-import EditableText from './EditableText';
-import EditableImage from './EditableImage';
-
 export default function Products() {
+    const [products, setProducts] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
+    const fetchProducts = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('products')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(8); // Show only recent items on home
+
+            if (error) throw error;
+            setProducts(data || []);
+        } catch (error) {
+            console.error('Error fetching home products:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <section className="products" id="products">
             <div className="container">
@@ -85,43 +64,49 @@ export default function Products() {
                     />
                 </motion.div>
 
-                <motion.div
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-[var(--space-md)]"
-                    variants={container}
-                    initial="hidden"
-                    whileInView="show"
-                    viewport={{ once: true, margin: "-100px" }}
-                >
-                    {PRODUCTS.map((product, i) => (
-                        <motion.div key={i} className="product-card" variants={item}>
-                            <div className="product-image">
-                                <EditableImage
-                                    id={`product-img-${i}`}
-                                    defaultSrc={`/images/goshen/${product.image}`}
-                                    alt={product.name}
-                                    className="w-full h-full object-cover"
-                                />
-                                {product.tag && (
-                                    <span className="product-tag">
-                                        <EditableText id={`product-tag-${i}`} defaultValue={product.tag} />
-                                    </span>
-                                )}
-                            </div>
-                            <div className="product-info">
-                                <h3 className="product-name">
-                                    <EditableText id={`product-name-${i}`} defaultValue={product.name} />
-                                </h3>
-                                <div className="product-description">
-                                    <EditableText
-                                        id={`product-desc-${i}`}
-                                        tagName="p"
-                                        defaultValue={product.description}
+                {isLoading ? (
+                    <div className="flex justify-center py-20">
+                        <Loader2 className="animate-spin text-[var(--color-primary)]" size={40} />
+                    </div>
+                ) : (
+                    <motion.div
+                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-[var(--space-md)]"
+                        variants={container}
+                        initial="hidden"
+                        whileInView="show"
+                        viewport={{ once: true, margin: "-100px" }}
+                    >
+                        {products.map((product, i) => (
+                            <motion.div key={product.id} className="product-card" variants={item}>
+                                <div className="product-image">
+                                    <EditableImage
+                                        id={`product-img-${product.id}`}
+                                        defaultSrc={product.image_path.startsWith('http') ? product.image_path : `/images/goshen/${product.image_path}`}
+                                        alt={product.name}
+                                        className="w-full h-full object-cover"
                                     />
+                                    {product.tag && (
+                                        <span className="product-tag font-bold">
+                                            <EditableText id={`product-tag-${product.id}`} defaultValue={product.tag} />
+                                        </span>
+                                    )}
                                 </div>
-                            </div>
-                        </motion.div>
-                    ))}
-                </motion.div>
+                                <div className="product-info">
+                                    <h3 className="product-name">
+                                        <EditableText id={`product-name-${product.id}`} defaultValue={product.name} />
+                                    </h3>
+                                    <div className="product-description">
+                                        <EditableText
+                                            id={`product-desc-${product.id}`}
+                                            tagName="p"
+                                            defaultValue={product.description}
+                                        />
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </motion.div>
+                )}
             </div>
         </section>
     );

@@ -59,11 +59,29 @@ export default function AdminAIChat() {
             </div>
 
             <div className="flex-1 p-6 overflow-y-auto space-y-4">
+                {messages.length === 1 && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                        {[
+                            "Draft a description for a Royal Gold Kimono",
+                            "Suggest items for a 'Summer Solstice' Lookbook",
+                            "How should I tag my best-selling items?",
+                            "Help me plan a new luxury collection"
+                        ].map((prompt, i) => (
+                            <button
+                                key={i}
+                                onClick={() => setInput(prompt)}
+                                className="text-left p-3 rounded-lg border border-white/5 bg-white/5 hover:bg-[var(--color-primary)]/10 hover:border-[var(--color-primary)]/20 transition-all text-xs text-[var(--color-text-subtle)] hover:text-white"
+                            >
+                                {prompt}
+                            </button>
+                        ))}
+                    </div>
+                )}
                 {messages.map((m, i) => (
                     <div key={i} className={`flex ${m.role === 'admin' ? 'justify-end' : 'justify-start'}`}>
                         <div className={`max-w-[80%] p-4 rounded-2xl text-sm ${m.role === 'admin'
-                                ? 'bg-[var(--gradient-gold)] text-[var(--color-bg-dark)] font-medium shadow-md'
-                                : 'bg-[var(--color-bg-dark)] border border-[var(--color-border)] text-white'
+                            ? 'bg-[var(--gradient-gold)] text-[var(--color-bg-dark)] font-medium shadow-md'
+                            : 'bg-[var(--color-bg-dark)] border border-[var(--color-border)] text-white'
                             }`}>
                             {m.text}
                         </div>

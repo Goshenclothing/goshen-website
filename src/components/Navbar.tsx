@@ -1,3 +1,7 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useAdmin } from '@/context/AdminContext';
 
 export default function Navbar() {

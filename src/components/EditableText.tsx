@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase';
 interface EditableTextProps {
     id: string;
     defaultValue: string;
-    tagName?: keyof JSX.IntrinsicElements;
+    tagName?: React.ElementType;
     className?: string;
 }
 

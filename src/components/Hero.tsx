@@ -1,3 +1,7 @@
+'use client';
+
+import { motion } from 'framer-motion';
+import Link from 'next/link';
 import EditableText from './EditableText';
 import EditableImage from './EditableImage';
 

@@ -1,4 +1,7 @@
+'use client';
+
 import { useAdmin } from '@/context/AdminContext';
+import { useState, useEffect, useRef } from 'react';
 
 export default function Chatbot() {
     const { isAdminMode } = useAdmin();

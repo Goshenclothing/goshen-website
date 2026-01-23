@@ -14,7 +14,7 @@ export default function TwoFactorPage() {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
     const router = useRouter();
-    const { user, refreshSession, set2FAComplete } = useUserAuth();
+    const { user, refreshSession, set2FAComplete, signOut } = useUserAuth();
     const inputRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
 
     const supabase = createBrowserClient(
@@ -176,7 +176,7 @@ export default function TwoFactorPage() {
 
                 <p className="text-center mt-8 text-[var(--color-text-subtle)]">
                     Having trouble?{' '}
-                    <button onClick={signOut} className="text-[var(--color-primary)] font-bold hover:underline">
+                    <button onClick={() => signOut()} className="text-[var(--color-primary)] font-bold hover:underline">
                         Sign Out
                     </button>
                 </p>

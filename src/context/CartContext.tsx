@@ -29,8 +29,14 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: React.ReactNode }) {
     const [items, setItems] = useState<CartItem[]>(() => {
         if (typeof window !== 'undefined') {
-            const saved = localStorage.getItem('goshen-cart');
-            return saved ? JSON.parse(saved) : [];
+            try {
+                const saved = localStorage.getItem('goshen-cart');
+                return saved ? JSON.parse(saved) : [];
+            } catch (error) {
+                console.error('[Cart] Failed to parse saved cart:', error);
+                localStorage.removeItem('goshen-cart');
+                return [];
+            }
         }
         return [];
     });

@@ -36,7 +36,8 @@ export default function AdminLogin() {
 
             // Verify admin role and email immediately (optional since middleware handles it, but good for UX)
             const isAdmin = data.session?.user.app_metadata?.role === 'admin';
-            const isTargetAdmin = data.session?.user.email === 'Mawuo247@gmail.com';
+            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'admin@example.com';
+            const isTargetAdmin = data.session?.user.email === adminEmail;
 
             if (!isAdmin || !isTargetAdmin) {
                 setError('Access denied. Admin privileges required.');

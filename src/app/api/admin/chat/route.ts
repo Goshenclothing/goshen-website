@@ -17,6 +17,8 @@ TONE: Professional, sophisticated, brand-focused.
 CONTEXT: Based in Accra, Ghana. Luxury contemporary African fashion.
 `;
 
+const TIMEOUT_MS = 30000;
+
 export async function POST(req: Request) {
     try {
         const cookieStore = await cookies();
@@ -43,13 +45,22 @@ export async function POST(req: Request) {
 
         // AUTHORIZATION (ROLE & EMAIL) CHECK
         const isAdmin = session.user.app_metadata?.role === 'admin';
-        const isTargetAdmin = session.user.email === 'Mawuo247@gmail.com';
+        const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'admin@example.com';
+        const isTargetAdmin = session.user.email === adminEmail;
 
         if (!isAdmin || !isTargetAdmin) {
             return NextResponse.json({ error: 'Forbidden. Admin credentials required.' }, { status: 403 });
         }
 
         const { messages } = await req.json();
+
+        if (!messages || !Array.isArray(messages) || messages.length === 0) {
+            return NextResponse.json(
+                { error: 'Invalid request: messages array is required' },
+                { status: 400 }
+            );
+        }
+
         const model = genAI.getGenerativeModel({
             model: "gemini-1.5-flash",
             systemInstruction: SYSTEM_INSTRUCTION
@@ -64,12 +75,38 @@ export async function POST(req: Request) {
         const chat = model.startChat({ history });
         const lastMessage = messages[messages.length - 1].text;
 
-        const result = await chat.sendMessage(lastMessage);
+        if (!lastMessage || typeof lastMessage !== 'string') {
+            return NextResponse.json(
+                { error: 'Invalid request: last message must be a string' },
+                { status: 400 }
+            );
+        }
+
+        // Create abort controller for timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+        let result;
+        try {
+            result = await chat.sendMessage(lastMessage);
+        } finally {
+            clearTimeout(timeoutId);
+        }
+
         const responseText = result.response.text();
 
-        return NextResponse.json({ text: responseText });
+        return NextResponse.json({ text: responseText }, { status: 200 });
     } catch (error: any) {
         console.error('Admin API Error:', error);
+
+        // Handle timeout specifically
+        if (error.name === 'AbortError') {
+            return NextResponse.json(
+                { error: 'Request took too long. Please try a shorter message.' },
+                { status: 504 }
+            );
+        }
+
         return NextResponse.json({ error: 'System error processing request.' }, { status: 500 });
     }
 }

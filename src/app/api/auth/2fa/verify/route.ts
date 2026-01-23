@@ -35,6 +35,12 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Invalid verification request. Please request a new PIN.' }, { status: 400 });
         }
 
+        // SECURITY: Verify the 2FA record belongs to current authenticated user
+        if (twoFactor.user_id !== user.id) {
+            console.warn(`[SECURITY] 2FA bypass attempt detected for user ${user.id}`);
+            return NextResponse.json({ error: 'Invalid verification request.' }, { status: 401 });
+        }
+
         // Check expiry
         if (new Date() > new Date(twoFactor.expires_at)) {
             return NextResponse.json({ error: 'PIN expired. Please request a new one.' }, { status: 400 });

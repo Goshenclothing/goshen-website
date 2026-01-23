@@ -20,14 +20,38 @@ export default function LoginPage() {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
+    // Validation helper
+    const validateForm = (): boolean => {
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            setError('Please enter a valid email address.');
+            return false;
+        }
+
+        // Password validation
+        if (password.length < 6) {
+            setError('Password must be at least 6 characters.');
+            return false;
+        }
+
+        return true;
+    };
+
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
         setError(null);
+
+        if (!validateForm()) {
+            setLoading(false);
+            return;
+        }
+
+        setLoading(true);
 
         try {
             const { data, error: loginError } = await supabase.auth.signInWithPassword({
-                email,
+                email: email.trim(),
                 password,
             });
 
@@ -35,7 +59,6 @@ export default function LoginPage() {
 
             if (data.user) {
                 // Success - redirect to 2FA verification
-                // We'll trigger the 2FA PIN send via an API route in the next step
                 router.push('/auth/2fa');
             }
         } catch (err: any) {
@@ -46,12 +69,16 @@ export default function LoginPage() {
     };
 
     const handleGoogleLogin = async () => {
-        await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: `${window.location.origin}/auth/callback`,
-            },
-        });
+        try {
+            await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: `${window.location.origin}/auth/callback`,
+                },
+            });
+        } catch (err: any) {
+            setError('Google login is temporarily unavailable. Please try again.');
+        }
     };
 
     return (

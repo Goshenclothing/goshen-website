@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
+export const dynamic = 'force-dynamic';
+
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -44,6 +46,7 @@ export const metadata: Metadata = {
 import { AdminProvider } from "@/context/AdminContext";
 import { CartProvider } from "@/context/CartContext";
 import { UserAuthProvider } from "@/context/UserAuthContext";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 export default function RootLayout({
   children,
@@ -55,13 +58,15 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${playfair.variable} antialiased`}
       >
-        <UserAuthProvider>
-          <AdminProvider>
-            <CartProvider>
-              {children}
-            </CartProvider>
-          </AdminProvider>
-        </UserAuthProvider>
+        <ErrorBoundary>
+          <UserAuthProvider>
+            <AdminProvider>
+              <CartProvider>
+                {children}
+              </CartProvider>
+            </AdminProvider>
+          </UserAuthProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

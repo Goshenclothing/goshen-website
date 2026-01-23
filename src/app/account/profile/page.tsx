@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from 'react';
 import { useUserAuth } from '@/context/UserAuthContext';
 import { createBrowserClient } from '@supabase/ssr';
@@ -38,11 +40,21 @@ export default function ProfilePage() {
     }, [user]);
 
     const fetchProfile = async () => {
+        if (!user?.id) {
+            setError('No user found');
+            return;
+        }
+        
         const { data, error } = await supabase
             .from('profiles')
             .select('*')
-            .eq('id', user!.id)
+            .eq('id', user.id)
             .single();
+
+        if (error) {
+            console.error('Failed to fetch profile:', error);
+            return;
+        }
 
         if (data) {
             setProfileData(data);
@@ -53,6 +65,11 @@ export default function ProfilePage() {
 
     const handleUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!user?.id) {
+            setError('User session lost. Please refresh and try again.');
+            return;
+        }
+
         setLoading(true);
         setError(null);
         setMessage(null);
@@ -65,7 +82,7 @@ export default function ProfilePage() {
                     phone: phone,
                     updated_at: new Date().toISOString()
                 })
-                .eq('id', user!.id);
+                .eq('id', user.id);
 
             if (updateError) throw updateError;
 

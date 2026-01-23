@@ -8,9 +8,14 @@ export async function middleware(request: NextRequest) {
         },
     });
 
+    // Only create Supabase client if environment variables are available
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+        return response;
+    }
+
     const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        process.env.NEXT_PUBLIC_SUPABASE_URL,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
         {
             cookies: {
                 get(name: string) {
@@ -65,7 +70,8 @@ export async function middleware(request: NextRequest) {
 
         // Role-based and Email-based authorization
         const isAdmin = session.user.app_metadata?.role === 'admin';
-        const isTargetAdmin = session.user.email === 'Mawuo247@gmail.com';
+        const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'admin@example.com';
+        const isTargetAdmin = session.user.email === adminEmail;
 
         if (!isAdmin || !isTargetAdmin) {
             // Log entry attempt

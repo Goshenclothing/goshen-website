@@ -28,6 +28,7 @@ export default function Chatbot() {
     ]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -46,9 +47,26 @@ export default function Chatbot() {
         const file = e.target.files?.[0];
         if (!file) return;
 
+        // SECURITY: Validate file size (max 5MB)
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (file.size > maxSize) {
+            setError(`File too large. Maximum size is 5MB`);
+            return;
+        }
+
+        // SECURITY: Validate file type
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        if (!allowedTypes.includes(file.type)) {
+            setError('Invalid image format. Please use JPEG, PNG, WebP, or GIF.');
+            return;
+        }
+
         const reader = new FileReader();
         reader.onloadend = () => {
             setSelectedImage(reader.result as string);
+        };
+        reader.onerror = () => {
+            setError('Failed to read image file.');
         };
         reader.readAsDataURL(file);
     };
@@ -58,6 +76,9 @@ export default function Chatbot() {
 
         const userMsg = input.trim();
         const imageData = selectedImage;
+
+        // Clear any previous errors
+        setError(null);
 
         // Add user message to UI
         setMessages(prev => [...prev, {

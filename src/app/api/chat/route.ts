@@ -27,9 +27,19 @@ const model = genAI.getGenerativeModel({
   `
 });
 
+// 30 second timeout for AI requests
+const TIMEOUT_MS = 30000;
+
 export async function POST(req: NextRequest) {
     try {
         const { messages, imageData } = await req.json();
+
+        if (!messages || !Array.isArray(messages) || messages.length === 0) {
+            return NextResponse.json(
+                { error: 'Invalid request: messages array is required' },
+                { status: 400 }
+            );
+        }
 
         // Normalize history to Gemini format
         const history = messages.slice(0, -1).map((m: any) => ({
@@ -39,35 +49,59 @@ export async function POST(req: NextRequest) {
 
         const lastMessage = messages[messages.length - 1].text;
 
+        if (!lastMessage || typeof lastMessage !== 'string') {
+            return NextResponse.json(
+                { error: 'Invalid request: last message must be a string' },
+                { status: 400 }
+            );
+        }
+
         const chat = model.startChat({
             history: history,
         });
 
+        // Create abort controller for timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
         let result;
-        if (imageData) {
-            // If image is provided, we send a multimodal message
-            const parts: any[] = [{ text: lastMessage }];
+        try {
+            if (imageData) {
+                // If image is provided, we send a multimodal message
+                const parts: any[] = [{ text: lastMessage }];
 
-            if (imageData.startsWith('data:')) {
-                const mimeType = imageData.split(';')[0].split(':')[1];
-                const base64Data = imageData.split(',')[1];
-                parts.push({
-                    inline_data: {
-                        mime_type: mimeType,
-                        data: base64Data
-                    }
-                });
+                if (imageData.startsWith('data:')) {
+                    const mimeType = imageData.split(';')[0].split(':')[1];
+                    const base64Data = imageData.split(',')[1];
+                    parts.push({
+                        inline_data: {
+                            mime_type: mimeType,
+                            data: base64Data
+                        }
+                    });
+                }
+
+                result = await chat.sendMessage(parts);
+            } else {
+                result = await chat.sendMessage(lastMessage);
             }
-
-            result = await chat.sendMessage(parts);
-        } else {
-            result = await chat.sendMessage(lastMessage);
+        } finally {
+            clearTimeout(timeoutId);
         }
 
         const responseText = result.response.text();
-        return NextResponse.json({ text: responseText });
+        return NextResponse.json({ text: responseText }, { status: 200 });
     } catch (error: any) {
         console.error("AI Error:", error);
+        
+        // Handle timeout specifically
+        if (error.name === 'AbortError') {
+            return NextResponse.json(
+                { error: 'Request took too long. Please try a shorter message.' },
+                { status: 504 }
+            );
+        }
+
         return NextResponse.json(
             { error: "I'm having trouble connecting to my creative circuits. Please try again later!" },
             { status: 500 }

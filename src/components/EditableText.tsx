@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase';
 interface EditableTextProps {
     id: string;
     defaultValue: string;
-    tagName?: React.ElementType;
+    tagName?: keyof React.JSX.IntrinsicElements;
     className?: string;
 }
 
@@ -33,35 +33,45 @@ export default function EditableText({ id, defaultValue, tagName: Tag = 'span', 
             localStorage.setItem(`goshen-content-${id}`, newContent);
 
             // INTELLIGENT SYNC: If ID matches a pattern, update Supabase!
-            if (id.startsWith('db-prod-')) {
-                const parts = id.split('-'); // db, prod, field, id
-                const field = parts[2]; // name, desc
-                const dbId = parts[3];
-                const dbField = field === 'name' ? 'name' : 'description';
+            try {
+                if (id.startsWith('db-prod-')) {
+                    const parts = id.split('-'); // db, prod, field, id
+                    const field = parts[2]; // name, desc
+                    const dbId = parts[3];
+                    const dbField = field === 'name' ? 'name' : 'description';
 
-                await supabase.from('products').update({ [dbField]: newContent }).eq('id', dbId);
-                console.log(`Synced product ${dbId} ${dbField} to database.`);
-            } else if (id.startsWith('db-coll-')) {
-                const parts = id.split('-'); // db, coll, field, id
-                const field = parts[2]; // title, desc
-                const dbId = parts[3];
-                const dbField = field === 'title' ? 'title' : 'description';
+                    const { error } = await supabase.from('products').update({ [dbField]: newContent }).eq('id', dbId);
+                    if (error) throw error;
+                    console.log(`Synced product ${dbId} ${dbField} to database.`);
+                } else if (id.startsWith('db-coll-')) {
+                    const parts = id.split('-'); // db, coll, field, id
+                    const field = parts[2]; // title, desc
+                    const dbId = parts[3];
+                    const dbField = field === 'title' ? 'title' : 'description';
 
-                await supabase.from('collections').update({ [dbField]: newContent }).eq('id', dbId);
-                console.log(`Synced collection ${dbId} ${dbField} to database.`);
+                    const { error } = await supabase.from('collections').update({ [dbField]: newContent }).eq('id', dbId);
+                    if (error) throw error;
+                    console.log(`Synced collection ${dbId} ${dbField} to database.`);
+                }
+            } catch (err: any) {
+                console.error('Failed to sync change to database:', err);
+                alert('Connection error: Changes saved locally but failed to sync with the server. Please check your connection and refresh.');
             }
         }
     };
 
+    // Cast Tag to any to avoid "complex union type" error with dynamic tags
+    const Component = Tag as any;
+
     return (
-        <Tag
-            ref={elementRef as any}
+        <Component
+            ref={elementRef}
             className={`${className} ${isAdminMode ? 'outline-dashed outline-1 outline-[var(--color-primary)] ring-offset-4 hover:bg-[var(--color-primary)]/10 cursor-text transition-all' : ''}`}
             contentEditable={isAdminMode}
             suppressContentEditableWarning={true}
             onBlur={handleBlur}
         >
             {content}
-        </Tag>
+        </Component>
     );
 }

@@ -1,52 +1,103 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createBrowserClient } from '@supabase/ssr';
+import { useRouter } from 'next/navigation';
+import type { User } from '@supabase/supabase-js';
 
 interface AdminContextType {
     isAdminMode: boolean;
-    setIsAdminMode: (val: boolean) => void;
+    user: User | null;
+    logout: () => Promise<void>;
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
 export function AdminProvider({ children }: { children: React.ReactNode }) {
     const [isAdminMode, setIsAdminMode] = useState(false);
+    const [user, setUser] = useState<User | null>(null);
+    const router = useRouter();
+
+    const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
 
     useEffect(() => {
-        // Load preference from localStorage
-        const saved = localStorage.getItem('goshen-admin-mode') === 'true';
-        if (saved) setIsAdminMode(true);
+        const checkAdminSession = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.user) {
+                // Refresh role from DB (metadata) to ensure it hasn't been revoked
+                const isAdmin = session.user.app_metadata?.role === 'admin';
+                const isTargetAdmin = session.user.email === 'Mawuo247@gmail.com';
 
-        // Global keyboard shortcut: Ctrl+Shift+A
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.ctrlKey && e.shiftKey && e.key === 'A') {
-                e.preventDefault();
-                setIsAdminMode(prev => {
-                    const next = !prev;
-                    localStorage.setItem('goshen-admin-mode', String(next));
-                    return next;
-                });
+                const valid = isAdmin && isTargetAdmin;
+                setUser(session.user);
+                setIsAdminMode(valid);
+
+                if (valid) {
+                    // Sync with server middleware
+                    router.refresh();
+                }
+            } else {
+                setUser(null);
+                setIsAdminMode(false);
             }
         };
 
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, []);
+        checkAdminSession();
+
+        // Setup real-time auth listener
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange(async (_event, session) => {
+            if (session?.user) {
+                const isAdmin = session.user.app_metadata?.role === 'admin';
+                const isTargetAdmin = session.user.email === 'Mawuo247@gmail.com';
+                const valid = isAdmin && isTargetAdmin;
+
+                setUser(session.user);
+                setIsAdminMode(valid);
+            } else {
+                setUser(null);
+                setIsAdminMode(false);
+            }
+
+            // Sync with server middleware
+            router.refresh();
+        });
+
+        // Set up periodic "heartbeat" to verify session is still valid
+        const heartbeat = setInterval(checkAdminSession, 5 * 60 * 1000); // Every 5 minutes
+
+        return () => {
+            subscription.unsubscribe();
+            clearInterval(heartbeat);
+        };
+    }, [supabase, router]);
+
+    const logout = async () => {
+        await supabase.auth.signOut();
+        setUser(null);
+        setIsAdminMode(false);
+        router.push('/');
+        router.refresh();
+    };
 
     return (
-        <AdminContext.Provider value={{ isAdminMode, setIsAdminMode }}>
+        <AdminContext.Provider value={{ isAdminMode, user, logout }}>
             {children}
-            {isAdminMode && (
-                <div className="fixed top-0 left-0 w-full bg-[var(--color-primary)] text-[var(--color-bg-dark)] py-1 px-4 text-xs font-bold z-[1001] flex justify-between items-center shadow-lg">
-                    <span>⚡ ADMIN CONTROL MODE ACTIVE - Click any text to edit</span>
+            {isAdminMode && user && (
+                <div className="fixed top-0 left-0 w-full bg-[var(--color-primary)] text-[var(--color-bg-dark)] py-1.5 px-6 text-[10px] tracking-wider font-bold z-[2000] flex justify-between items-center shadow-xl border-b border-black/10">
+                    <div className="flex items-center gap-3">
+                        <span className="flex h-2 w-2 rounded-full bg-[var(--color-bg-dark)] animate-pulse"></span>
+                        <span className="uppercase">Secure Admin Session • {user.email}</span>
+                    </div>
                     <button
-                        onClick={() => {
-                            setIsAdminMode(false);
-                            localStorage.setItem('goshen-admin-mode', 'false');
-                        }}
-                        className="bg-black/20 hover:bg-black/40 px-2 py-0.5 rounded transition-colors"
+                        onClick={logout}
+                        className="bg-black/10 hover:bg-black/20 px-3 py-0.5 rounded-full transition-all border border-black/5 hover:border-black/10 flex items-center gap-2"
                     >
-                        Exit Mode
+                        <span>End Session</span>
                     </button>
                 </div>
             )}

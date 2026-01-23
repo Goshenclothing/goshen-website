@@ -18,9 +18,11 @@ import Link from 'next/link';
 import AdminAIChat from '@/components/AdminAIChat';
 import ProductManager from '@/components/ProductManager';
 import CollectionManager from '@/components/CollectionManager';
+import { useAdmin } from '@/context/AdminContext';
 
 export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState('overview');
+    const { logout } = useAdmin();
 
     const sidebarItems = [
         { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -57,7 +59,7 @@ export default function AdminDashboard() {
                 </nav>
 
                 <div className="mt-auto pt-10">
-                    <button onClick={() => window.location.href = '/'} className="flex items-center gap-3 px-4 py-3 text-[var(--color-text-subtle)] hover:text-red-400 transition-colors w-full">
+                    <button onClick={logout} className="flex items-center gap-3 px-4 py-3 text-[var(--color-text-subtle)] hover:text-red-400 transition-colors w-full">
                         <LogOut size={20} />
                         <span className="font-semibold text-sm">Sign Out</span>
                     </button>

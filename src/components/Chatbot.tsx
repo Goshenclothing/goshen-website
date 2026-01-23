@@ -2,6 +2,17 @@
 
 import { useAdmin } from '@/context/AdminContext';
 import { useState, useEffect, useRef } from 'react';
+import {
+    Send,
+    Image as ImageIcon,
+    X,
+    MessageSquare,
+    RefreshCcw,
+    Loader2,
+    Camera,
+    Sparkles
+} from 'lucide-react';
+import NextImage from 'next/image';
 
 export default function Chatbot() {
     const { isAdminMode } = useAdmin();
@@ -11,28 +22,52 @@ export default function Chatbot() {
     ]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
     useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
+        if (isOpen) {
+            scrollToBottom();
+        }
+    }, [messages, isOpen]);
+
+    const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setSelectedImage(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+    };
 
     const handleSend = async () => {
-        if (!input.trim() || isLoading) return;
+        if ((!input.trim() && !selectedImage) || isLoading) return;
 
         const userMsg = input.trim();
-        setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
+        const imageData = selectedImage;
+
+        // Add user message to UI
+        setMessages(prev => [...prev, {
+            role: 'user',
+            text: userMsg || "Sent an image",
+            image: imageData || undefined
+        }]);
+
         setInput('');
+        setSelectedImage(null);
         setIsLoading(true);
 
-        // Admin command shortcuts in chat
+        // Admin command shortcuts
         if (isAdminMode && userMsg.toLowerCase() === 'reset content') {
             localStorage.clear();
-            setMessages(prev => [...prev, { role: 'bot', text: "Content reset! Please refresh the page. 🔄" }]);
+            setMessages(prev => [...prev, { role: 'bot', text: "Content reset! Please refresh. 🔄" }]);
             setIsLoading(false);
             return;
         }
@@ -42,26 +77,20 @@ export default function Chatbot() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    messages: [...messages, { role: 'user', text: userMsg }]
+                    messages: messages.map(m => ({ role: m.role, text: m.text })),
+                    imageData: imageData
                 }),
             });
 
             const data = await response.json();
-
             if (data.error) throw new Error(data.error);
 
             setMessages(prev => [...prev, { role: 'bot', text: data.text }]);
         } catch (error) {
-            let errorText = "I'm experiencing a temporary connection issue. Please make sure the API key is configured or try again in a moment! ✨";
+            let errorText = "I'm having trouble connecting to my creative circuits. Please try again! ✨";
+            if (isAdminMode) errorText = "⚠️ ADMIN: AI failing. Check GEMINI_API_KEY in environment variables.";
 
-            if (isAdminMode) {
-                errorText = "⚠️ ADMIN TIP: The AI is failing. This usually means the 'GEMINI_API_KEY' is missing from Netlify's Environment Variables. Please add it in Netlify settings! 🔑";
-            }
-
-            setMessages(prev => [...prev, {
-                role: 'bot',
-                text: errorText
-            }]);
+            setMessages(prev => [...prev, { role: 'bot', text: errorText }]);
         } finally {
             setIsLoading(false);
         }
@@ -69,55 +98,118 @@ export default function Chatbot() {
 
     return (
         <div className="chatbot-container">
-            <div className={`chatbot-window ${isOpen ? 'active' : ''}`}>
+            <div className={`chatbot-window ${isOpen ? 'active' : ''} glass-card`}>
                 <div className="chatbot-header">
-                    <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                        <span>Goshen Assistant</span>
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-[var(--gradient-gold)] flex items-center justify-center shadow-lg">
+                            <Sparkles size={16} className="text-[var(--color-bg-dark)]" />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-sm font-bold tracking-tight">Goshen AI Assistant</span>
+                            <span className="text-[10px] text-green-500 flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                                Online & Elegant
+                            </span>
+                        </div>
                     </div>
-                    <button className="chatbot-close" onClick={() => setIsOpen(false)}>×</button>
+                    <button className="p-1 hover:bg-white/10 rounded-lg transition-colors" onClick={() => setIsOpen(false)}>
+                        <X size={20} />
+                    </button>
                 </div>
 
                 <div className="chatbot-messages">
                     {messages.map((m, i) => (
-                        <div key={i} className={`chat-message ${m.role}`}>
-                            {m.text}
+                        <div key={i} className={`chat-message ${m.role} group`}>
+                            {m.image && (
+                                <div className="mb-2 rounded-xl overflow-hidden border border-white/10">
+                                    <img src={m.image} alt="User upload" className="max-w-full h-auto" />
+                                </div>
+                            )}
+                            <div className="message-text">
+                                {m.text}
+                            </div>
                         </div>
                     ))}
                     {isLoading && (
-                        <div className="chat-message bot opacity-50">
-                            Thinking...
+                        <div className="chat-message bot opacity-50 flex items-center gap-2">
+                            <Loader2 size={14} className="animate-spin text-[var(--color-primary)]" />
+                            <span>Designing a response...</span>
                         </div>
                     )}
                     <div ref={messagesEndRef} />
                 </div>
 
-                <div className="chatbot-input-container">
-                    <input
-                        type="text"
-                        className="chatbot-input"
-                        placeholder="Ask me anything..."
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                        disabled={isLoading}
-                    />
-                    <button className="chatbot-send" onClick={handleSend} disabled={isLoading}>
-                        <svg viewBox="0 0 24 24" className={isLoading ? 'animate-spin' : ''}>
-                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-                        </svg>
-                    </button>
+                <div className="chatbot-controls-container">
+                    {/* Image Preview */}
+                    {selectedImage && (
+                        <div className="px-4 py-2 border-t border-white/5 bg-white/5 flex items-center gap-3 animate-fade-in">
+                            <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-[var(--color-primary)]">
+                                <img src={selectedImage} alt="Preview" className="w-full h-full object-cover" />
+                                <button
+                                    onClick={() => setSelectedImage(null)}
+                                    className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
+                                >
+                                    <X size={12} className="text-white" />
+                                </button>
+                            </div>
+                            <span className="text-[10px] text-[var(--color-text-subtle)] uppercase tracking-widest font-bold">Image ready to scan</span>
+                        </div>
+                    )}
+
+                    <div className="chatbot-input-area p-4 pt-2">
+                        <div className="flex items-center gap-2 bg-[var(--color-bg-dark)] border border-white/10 rounded-2xl p-1.5 focus-within:border-[var(--color-primary)]/50 transition-all shadow-inner">
+                            <button
+                                onClick={() => fileInputRef.current?.click()}
+                                className="p-2.5 text-[var(--color-text-subtle)] hover:text-[var(--color-primary)] hover:bg-white/5 rounded-xl transition-all"
+                                title="Upload visual context"
+                            >
+                                <Camera size={20} />
+                            </button>
+                            <input
+                                type="text"
+                                className="flex-1 bg-transparent border-none outline-none py-2 px-1 text-sm placeholder:text-white/20"
+                                placeholder="Describe a style or ask about fabrics..."
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                                onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                                disabled={isLoading}
+                            />
+                            <button
+                                className={`p-2.5 rounded-xl transition-all ${(input.trim() || selectedImage) && !isLoading
+                                        ? 'bg-[var(--gradient-gold)] text-[var(--color-bg-dark)] shadow-lg scale-100'
+                                        : 'text-white/20 scale-95 opacity-50'
+                                    }`}
+                                onClick={handleSend}
+                                disabled={isLoading || (!input.trim() && !selectedImage)}
+                            >
+                                <Send size={18} />
+                            </button>
+                        </div>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            className="hidden"
+                            accept="image/*"
+                            onChange={handleImageSelect}
+                        />
+                    </div>
                 </div>
             </div>
+
             <button
-                className="chatbot-toggle"
+                className={`chatbot-toggle ${isOpen ? 'active hover:rotate-90' : 'hover:scale-110 shadow-[0_0_30px_rgba(212,175,55,0.3)]'} transition-all duration-500`}
                 onClick={() => setIsOpen(!isOpen)}
-                aria-label="Open chat"
+                aria-label="Toggle Goshen Intelligence"
             >
-                <svg viewBox="0 0 24 24">
-                    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z" />
-                </svg>
+                {isOpen ? <X size={24} /> : <Sparkles size={24} />}
+                {!isOpen && (
+                    <span className="absolute -top-1 -right-1 flex h-4 w-4">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-primary)] opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-4 w-4 bg-[var(--color-primary)]"></span>
+                    </span>
+                )}
             </button>
         </div>
     );
 }
+

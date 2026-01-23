@@ -57,15 +57,27 @@ export default function EditableImage({ id, defaultSrc, alt, className = '' }: E
                 localStorage.setItem(`goshen-image-${id}`, newPath);
 
                 // SYNC TO DATABASE
-                if (id.startsWith('db-prod-')) {
-                    setIsSyncing(true);
-                    const dbId = id.split('-')[3];
-                    await supabase.from('products').update({ image_path: newPath }).eq('id', dbId);
-                    setIsSyncing(false);
-                } else if (id.startsWith('db-coll-')) {
-                    setIsSyncing(true);
-                    const dbId = id.split('-')[3];
-                    await supabase.from('collections').update({ image_path: newPath }).eq('id', dbId);
+                try {
+                    const parts = id.split('-');
+                    const dbId = parts[3];
+                    const isProduct = id.startsWith('db-prod-');
+                    const isCollection = id.startsWith('db-coll-');
+
+                    if (isProduct || isCollection) {
+                        setIsSyncing(true);
+                        const table = isProduct ? 'products' : 'collections';
+                        const { error } = await supabase
+                            .from(table)
+                            .update({ image_path: newPath })
+                            .eq('id', dbId);
+
+                        if (error) throw error;
+                        console.log(`Synced ${table} ${dbId} image to database.`);
+                    }
+                } catch (err: any) {
+                    console.error('Failed to sync image change:', err);
+                    alert('Connection error: Changes saved locally but failed to sync with the server.');
+                } finally {
                     setIsSyncing(false);
                 }
             }

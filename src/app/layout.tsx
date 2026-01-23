@@ -13,18 +13,37 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://goshen-clothing.com'),
   title: "Goshen Clothing | African Elegance Meets Modern Design",
   description: "Discover authentic African fashion. Premium handcrafted kimonos, traditional wear, and contemporary African designs. Visit our showroom in Accra, Ghana.",
   keywords: "African fashion, Goshen Clothing, kimonos, African prints, Ghana fashion, Accra, traditional wear",
   authors: [{ name: "Goshen Clothing" }],
+  icons: {
+    icon: [
+      { url: '/favicon.png' },
+      { url: '/favicon.png', sizes: '32x32', type: 'image/png' },
+    ],
+    shortcut: '/favicon.png',
+    apple: '/favicon.png',
+  },
   openGraph: {
     title: "Goshen Clothing - African Elegance Meets Modern Design",
     description: "Premium handcrafted African fashion. Visit our showroom in Accra, Ghana.",
     type: "website",
+    images: [
+      {
+        url: '/logo.png',
+        width: 1200,
+        height: 630,
+        alt: 'Goshen Clothing Logo',
+      },
+    ],
   },
 };
 
 import { AdminProvider } from "@/context/AdminContext";
+import { CartProvider } from "@/context/CartContext";
+import { UserAuthProvider } from "@/context/UserAuthContext";
 
 export default function RootLayout({
   children,
@@ -36,9 +55,13 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${playfair.variable} antialiased`}
       >
-        <AdminProvider>
-          {children}
-        </AdminProvider>
+        <UserAuthProvider>
+          <AdminProvider>
+            <CartProvider>
+              {children}
+            </CartProvider>
+          </AdminProvider>
+        </UserAuthProvider>
       </body>
     </html>
   );

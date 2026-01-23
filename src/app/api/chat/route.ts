@@ -29,25 +29,42 @@ const model = genAI.getGenerativeModel({
 
 export async function POST(req: NextRequest) {
     try {
-        const { messages } = await req.json();
+        const { messages, imageData } = await req.json();
 
-        // We expect an array of { role: 'user' | 'model', parts: [{ text: string }] }
-        // but the client might send { role: 'user' | 'bot', text: string }
-        // Normalize to Gemini format
+        // Normalize history to Gemini format
         const history = messages.slice(0, -1).map((m: any) => ({
             role: m.role === 'user' ? 'user' : 'model',
             parts: [{ text: m.text }]
         }));
 
-        const currentMessage = messages[messages.length - 1].text;
+        const lastMessage = messages[messages.length - 1].text;
 
         const chat = model.startChat({
             history: history,
         });
 
-        const result = await chat.sendMessage(currentMessage);
-        const responseText = result.response.text();
+        let result;
+        if (imageData) {
+            // If image is provided, we send a multimodal message
+            const parts: any[] = [{ text: lastMessage }];
 
+            if (imageData.startsWith('data:')) {
+                const mimeType = imageData.split(';')[0].split(':')[1];
+                const base64Data = imageData.split(',')[1];
+                parts.push({
+                    inline_data: {
+                        mime_type: mimeType,
+                        data: base64Data
+                    }
+                });
+            }
+
+            result = await chat.sendMessage(parts);
+        } else {
+            result = await chat.sendMessage(lastMessage);
+        }
+
+        const responseText = result.response.text();
         return NextResponse.json({ text: responseText });
     } catch (error: any) {
         console.error("AI Error:", error);

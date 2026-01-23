@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit2, ImageIcon, Loader2 } from 'lucide-react';
+import { Plus, Trash2, Edit2, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 interface Product {
@@ -66,7 +66,7 @@ export default function ProductManager() {
         if (!newProduct.name) return;
 
         try {
-            const { data, error } = await supabase
+            const { error } = await supabase
                 .from('products')
                 .insert([{
                     name: newProduct.name,
@@ -192,8 +192,10 @@ export default function ProductManager() {
                                 <tr key={product.id} className="hover:bg-white/5 transition-colors group">
                                     <td className="px-6 py-4">
                                         <div className="w-12 h-12 bg-black/40 rounded flex items-center justify-center border border-[var(--color-border)] overflow-hidden shadow-inner">
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
                                             <img
                                                 src={product.image_path.startsWith('http') ? product.image_path : `/images/goshen/${product.image_path}`}
+                                                alt={product.name}
                                                 className="w-full h-full object-cover"
                                                 onError={(e) => (e.currentTarget.src = 'https://via.placeholder.com/150')}
                                             />

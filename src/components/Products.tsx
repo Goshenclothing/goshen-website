@@ -5,7 +5,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import EditableText from './EditableText';
 import EditableImage from './EditableImage';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ShoppingCart } from 'lucide-react';
+import { useCart } from '@/context/CartContext';
 
 const container = {
     hidden: { opacity: 0 },
@@ -22,9 +23,20 @@ const item = {
     show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as any } }
 };
 
+interface Product {
+    id: string;
+    name: string;
+    description: string;
+    image_path: string;
+    tag?: string;
+    price?: number;
+}
+
 export default function Products() {
-    const [products, setProducts] = useState<any[]>([]);
+    const { addItem } = useCart();
+    const [products, setProducts] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [addedProducts, setAddedProducts] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         fetchProducts();
@@ -76,7 +88,7 @@ export default function Products() {
                         whileInView="show"
                         viewport={{ once: true, margin: "-100px" }}
                     >
-                        {products.map((product, i) => (
+                        {products.map((product) => (
                             <motion.div key={product.id} className="product-card" variants={item}>
                                 <div className="product-image">
                                     <EditableImage
@@ -101,6 +113,34 @@ export default function Products() {
                                             tagName="p"
                                             defaultValue={product.description}
                                         />
+                                    </div>
+                                    <div className="flex items-center justify-between mt-3">
+                                        <span className="text-lg font-bold text-[var(--color-primary)]">
+                                            GHS {(product.price || 150).toFixed(2)}
+                                        </span>
+                                        <button
+                                            onClick={() => {
+                                                addItem({
+                                                    id: product.id,
+                                                    name: product.name,
+                                                    price: product.price || 150,
+                                                    image_path: product.image_path
+                                                });
+                                                setAddedProducts(prev => new Set(prev).add(product.id));
+                                                setTimeout(() => {
+                                                    setAddedProducts(prev => {
+                                                        const newSet = new Set(prev);
+                                                        newSet.delete(product.id);
+                                                        return newSet;
+                                                    });
+                                                }, 2000);
+                                            }}
+                                            className={`btn btn-primary py-2 px-4 text-sm flex items-center gap-2 transition-all ${addedProducts.has(product.id) ? 'bg-green-600 hover:bg-green-700' : ''
+                                                }`}
+                                        >
+                                            <ShoppingCart size={16} />
+                                            {addedProducts.has(product.id) ? 'Added!' : 'Add to Cart'}
+                                        </button>
                                     </div>
                                 </div>
                             </motion.div>

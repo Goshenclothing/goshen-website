@@ -11,9 +11,15 @@ export default function AdminAIChat() {
     const [isLoading, setIsLoading] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
 
+    const [mounted, setMounted] = useState(false);
+
     useEffect(() => {
-        scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
+        if (mounted) {
+            scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            setMounted(true);
+        }
+    }, [messages, mounted]);
 
     const handleSend = async () => {
         if (!input.trim() || isLoading) return;

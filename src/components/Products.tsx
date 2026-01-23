@@ -44,16 +44,29 @@ export default function Products() {
 
     const fetchProducts = async () => {
         try {
+            setIsLoading(true);
             const { data, error } = await supabase
                 .from('products')
-                .select('*')
+                .select('id, name, description, image_path, tag, price, created_at')
                 .order('created_at', { ascending: false })
-                .limit(8); // Show only recent items on home
+                .limit(8);
 
-            if (error) throw error;
+            if (error) {
+                console.error('[Products] Supabase error:', error);
+                throw error;
+            }
+            
+            if (!data) {
+                console.warn('[Products] No data returned from query');
+                setProducts([]);
+                return;
+            }
+            
             setProducts(data || []);
         } catch (error) {
-            console.error('Error fetching home products:', error);
+            const err = error instanceof Error ? error : new Error(String(error));
+            console.error('[Products] Failed to fetch:', err.message);
+            setProducts([]); // Gracefully degrade to empty state
         } finally {
             setIsLoading(false);
         }

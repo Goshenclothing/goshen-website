@@ -2,6 +2,7 @@
 
 import { useAdmin } from '@/context/AdminContext';
 import { useState, useEffect, useRef } from 'react';
+import { apiPost } from '@/lib/apiClient';
 import {
     Send,
     Image as ImageIcon,
@@ -100,22 +101,31 @@ export default function Chatbot() {
         }
 
         try {
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    messages: messages.map(m => ({ role: m.role, text: m.text })),
-                    imageData: imageData
-                }),
+            const response = await apiPost<{ text: string }>('/api/chat', {
+                messages: messages.map(m => ({ role: m.role, text: m.text })),
+                imageData: imageData
             });
 
-            const data = await response.json();
-            if (data.error) throw new Error(data.error);
+            if (response.error) {
+                throw new Error(response.error);
+            }
 
-            setMessages(prev => [...prev, { role: 'bot', text: data.text }]);
+            if (!response.data?.text) {
+                throw new Error('No response from AI service');
+            }
+
+            setMessages(prev => [...prev, { role: 'bot', text: response.data.text }]);
         } catch (error) {
-            let errorText = "I'm having trouble connecting to my creative circuits. Please try again! ✨";
-            if (isAdminMode) errorText = "⚠️ ADMIN: AI failing. Check GEMINI_API_KEY in environment variables.";
+            const errorMsg = error instanceof Error ? error.message : String(error);
+            let errorText = "I'm having trouble connecting. Please try again! ✨";
+            
+            if (errorMsg.includes('timeout') || errorMsg.includes('504')) {
+                errorText = "That took too long. Please try a shorter message. ⏱️";
+            } else if (errorMsg.includes('503')) {
+                errorText = "AI service is temporarily unavailable. Please try again later. 🔄";
+            } else if (isAdminMode) {
+                errorText = `⚠️ ADMIN: ${errorMsg}`;
+            }
 
             setMessages(prev => [...prev, { role: 'bot', text: errorText }]);
         } finally {

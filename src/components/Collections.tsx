@@ -18,15 +18,28 @@ export default function Collections() {
 
     const fetchCollections = async () => {
         try {
+            setIsLoading(true);
             const { data, error } = await supabase
                 .from('collections')
-                .select('*')
+                .select('id, title, image_path, description, created_at')
                 .order('created_at', { ascending: true });
 
-            if (error) throw error;
+            if (error) {
+                console.error('[Collections] Supabase error:', error);
+                throw error;
+            }
+            
+            if (!data) {
+                console.warn('[Collections] No data returned from query');
+                setCollections([]);
+                return;
+            }
+            
             setCollections(data || []);
         } catch (error) {
-            console.error('Error fetching home collections:', error);
+            const err = error instanceof Error ? error : new Error(String(error));
+            console.error('[Collections] Failed to fetch:', err.message);
+            setCollections([]); // Gracefully degrade to empty state
         } finally {
             setIsLoading(false);
         }

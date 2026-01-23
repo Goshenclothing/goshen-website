@@ -35,35 +35,58 @@ export default function ProductManager() {
         setIsLoading(true);
         try {
             // Fetch collections first for the dropdown
-            const { data: collData } = await supabase.from('collections').select('id, title');
-            setCollections(collData || []);
+            const { data: collData, error: collError } = await supabase
+                .from('collections')
+                .select('id, title')
+                .order('created_at', { ascending: true });
+            
+            if (collError) {
+                console.error('[ProductManager] Failed to fetch collections:', collError);
+            } else {
+                setCollections(collData || []);
+            }
 
             // Fetch products with collection info
-            const { data: prodData, error } = await supabase
+            const { data: prodData, error: prodError } = await supabase
                 .from('products')
                 .select(`
-                    *,
+                    id,
+                    name,
+                    description,
+                    collection_id,
+                    tag,
+                    image_path,
+                    price,
+                    created_at,
                     collections (title)
                 `)
                 .order('created_at', { ascending: false });
 
-            if (error) throw error;
+            if (prodError) {
+                console.error('[ProductManager] Failed to fetch products:', prodError);
+                throw prodError;
+            }
 
-            const formattedProducts = prodData?.map(p => ({
+            const formattedProducts = prodData?.map((p: any) => ({
                 ...p,
                 collection_title: p.collections?.title
             })) || [];
 
             setProducts(formattedProducts);
         } catch (error) {
-            console.error('Error fetching products:', error);
+            const err = error instanceof Error ? error : new Error(String(error));
+            console.error('[ProductManager] Fetch failed:', err.message);
+            alert(`Failed to load data: ${err.message}`);
         } finally {
             setIsLoading(false);
         }
     };
 
     const handleAdd = async () => {
-        if (!newProduct.name) return;
+        if (!newProduct.name) {
+            alert('Please enter a product name');
+            return;
+        }
 
         try {
             const { error } = await supabase
@@ -73,18 +96,24 @@ export default function ProductManager() {
                     collection_id: newProduct.collection_id || null,
                     tag: newProduct.tag || null,
                     image_path: newProduct.image_path || 'placeholder.jpg',
-                    description: newProduct.description || ''
+                    description: newProduct.description || '',
+                    price: 0
                 }])
                 .select();
 
-            if (error) throw error;
+            if (error) {
+                console.error('[ProductManager] Insert error:', error);
+                throw error;
+            }
 
-            await fetchData(); // Refresh list
+            // Reset form and refresh list
             setNewProduct({ name: '', collection_id: '', tag: '', image_path: '', description: '' });
             setIsAdding(false);
+            await fetchData();
         } catch (error) {
-            console.error('Error adding product:', error);
-            alert('Failed to add product. Check console.');
+            const err = error instanceof Error ? error : new Error(String(error));
+            console.error('[ProductManager] Add failed:', err.message);
+            alert(`Failed to add product: ${err.message}`);
         }
     };
 

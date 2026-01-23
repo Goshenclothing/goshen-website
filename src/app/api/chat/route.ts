@@ -1,6 +1,11 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 
+// Validate API key at startup
+if (!process.env.GEMINI_API_KEY) {
+    console.warn("⚠️ GEMINI_API_KEY is not configured. Chat AI will not work.");
+}
+
 // Initialize the Gemini SDK
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 const model = genAI.getGenerativeModel({
@@ -30,9 +35,28 @@ const model = genAI.getGenerativeModel({
 // 30 second timeout for AI requests
 const TIMEOUT_MS = 30000;
 
-export async function POST(req: NextRequest) {
+interface ChatRequest {
+    messages: Array<{ role: string; text: string }>;
+    imageData?: string;
+}
+
+interface ChatResponse {
+    text?: string;
+    error?: string;
+}
+
+export async function POST(req: NextRequest): Promise<NextResponse<ChatResponse>> {
     try {
-        const { messages, imageData } = await req.json();
+        if (!process.env.GEMINI_API_KEY) {
+            console.error("GEMINI_API_KEY not configured");
+            return NextResponse.json(
+                { error: 'AI service is not configured. Please contact support.' },
+                { status: 503 }
+            );
+        }
+
+        const body: ChatRequest = await req.json();
+        const { messages, imageData } = body;
 
         if (!messages || !Array.isArray(messages) || messages.length === 0) {
             return NextResponse.json(
@@ -92,18 +116,20 @@ export async function POST(req: NextRequest) {
         const responseText = result.response.text();
         return NextResponse.json({ text: responseText }, { status: 200 });
     } catch (error: any) {
-        console.error("AI Error:", error);
+        const errorMessage = error?.message || String(error);
+        console.error("[Chat API]", errorMessage);
         
         // Handle timeout specifically
-        if (error.name === 'AbortError') {
+        if (error?.name === 'AbortError') {
             return NextResponse.json(
                 { error: 'Request took too long. Please try a shorter message.' },
                 { status: 504 }
             );
         }
 
+        // Don't expose internal error details to client
         return NextResponse.json(
-            { error: "I'm having trouble connecting to my creative circuits. Please try again later!" },
+            { error: "I'm having trouble connecting. Please try again later!" },
             { status: 500 }
         );
     }

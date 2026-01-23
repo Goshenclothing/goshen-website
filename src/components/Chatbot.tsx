@@ -14,10 +14,16 @@ import {
 } from 'lucide-react';
 import NextImage from 'next/image';
 
+type Message = {
+    role: string;
+    text: string;
+    image?: string;
+};
+
 export default function Chatbot() {
     const { isAdminMode } = useAdmin();
     const [isOpen, setIsOpen] = useState(false);
-    const [messages, setMessages] = useState([
+    const [messages, setMessages] = useState<Message[]>([
         { role: 'bot', text: "Hello! I'm your Goshen assistant. Ask me about our collections, luxury kimonos, or styling advice." }
     ]);
     const [input, setInput] = useState('');

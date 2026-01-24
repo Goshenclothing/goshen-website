@@ -7,7 +7,7 @@ import EditableImage from './EditableImage';
 
 const HERO_IMAGES = [
     { name: 'WhatsApp Image 2025-12-30 at 12.12.45.jpeg', class: 'img-tl' },
-    { name: 'WhatsApp Image 2025-12-30 at 12.12.4jj.jpeg', class: 'img-bl' },
+    { name: 'WhatsApp Image 2025-12-30 at 12.12.46.jpeg', class: 'img-bl' },
     { name: 'WhatsApp Image 2025-12-30 at 12.12.46.jpeg', class: 'img-tr' },
     { name: 'WhatsApp Image 2025-12-30 at 12.12.47.jpeg', class: 'img-br' }
 ];

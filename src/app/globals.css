@@ -179,7 +179,7 @@ body.theme-dark {
 
 /* Custom Scroll To Top */
 .scroll-top-btn {
-  @apply fixed bottom-24 right-8 w-12 h-12 border-none rounded-full cursor-pointer opacity-0 invisible translate-y-5 transition-[var(--transition-normal)] z-[999] flex items-center justify-center;
+  @apply fixed bottom-40 right-8 w-12 h-12 border-none rounded-full cursor-pointer opacity-0 invisible translate-y-5 transition-all duration-300 z-[999] flex items-center justify-center;
   background: var(--gradient-gold);
   box-shadow: var(--shadow-glow);
 }
@@ -189,7 +189,12 @@ body.theme-dark {
 }
 
 .scroll-top-btn:hover {
-  @apply -translate-y-[5px] scale-110;
+  @apply -translate-y-[8px] scale-110 shadow-xl;
+  transform: translateY(-8px) scale(1.1);
+}
+
+.scroll-top-btn:active {
+  @apply scale-95;
 }
 
 /* Navbar Styles */
@@ -361,15 +366,16 @@ body.theme-dark {
 }
 
 .product-card {
-  @apply rounded-[var(--radius-md)] overflow-hidden border transition-[var(--transition-normal)] relative;
+  @apply rounded-[var(--radius-md)] overflow-hidden border transition-all duration-300 relative;
   background: var(--gradient-card);
   border-color: var(--color-border-light);
 }
 
 .product-card:hover {
-  @apply -translate-y-2.5;
-  box-shadow: var(--shadow-card), var(--shadow-glow);
-  border-color: var(--color-border);
+  @apply -translate-y-3 shadow-2xl;
+  box-shadow: 0 20px 40px rgba(212, 175, 55, 0.2), var(--shadow-glow);
+  border-color: var(--color-primary);
+  background: var(--gradient-card);
 }
 
 .product-image {
@@ -377,7 +383,7 @@ body.theme-dark {
 }
 
 .product-image img {
-  @apply w-full h-full object-cover transition-[var(--transition-slow)];
+  @apply w-full h-full object-cover transition-all duration-500;
 }
 
 .product-card:hover .product-image img {
@@ -420,10 +426,15 @@ body.theme-dark {
 .collection-item {
   @apply relative overflow-hidden cursor-pointer h-[300px];
   border-radius: var(--radius-md);
+  transition: transform 0.3s ease;
+}
+
+.collection-item:hover {
+  @apply -translate-y-2;
 }
 
 .collection-item img {
-  @apply w-full h-full object-cover transition-[var(--transition-slow)];
+  @apply w-full h-full object-cover transition-all duration-500;
 }
 
 .collection-item:hover img {
@@ -431,13 +442,13 @@ body.theme-dark {
 }
 
 .collection-overlay {
-  @apply absolute inset-0 flex flex-col justify-end transition-[var(--transition-normal)];
+  @apply absolute inset-0 flex flex-col justify-end transition-all duration-300;
   padding: var(--space-md);
   background: linear-gradient(transparent 50%, rgba(0, 0, 0, 0.8));
 }
 
 .collection-item:hover .collection-overlay {
-  background: linear-gradient(transparent 30%, rgba(0, 0, 0, 0.9));
+  background: linear-gradient(transparent 30%, rgba(0, 0, 0, 0.95));
 }
 
 .collection-title {
@@ -657,4 +668,75 @@ body.theme-dark {
   .mobile-menu-btn {
     @apply flex;
   }
+}
+
+/* Chatbot Container Styles */
+.chatbot-container {
+  @apply fixed right-8 bottom-8 z-[998] flex flex-col items-end gap-3;
+}
+
+.chatbot-toggle {
+  @apply relative w-14 h-14 rounded-full border-none cursor-pointer flex items-center justify-center transition-all duration-500;
+  background: var(--gradient-gold);
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+  color: var(--color-bg-dark);
+}
+
+.chatbot-toggle:hover {
+  @apply scale-110 shadow-2xl;
+  box-shadow: 0 0 40px rgba(212, 175, 55, 0.5);
+}
+
+.chatbot-toggle:active {
+  @apply scale-95;
+}
+
+.chatbot-toggle.active {
+  @apply rotate-90;
+}
+
+.chatbot-toggle.active:hover {
+  @apply scale-110 rotate-90;
+}
+
+/* Chatbot Window */
+.chatbot-window {
+  @apply absolute bottom-full right-0 mb-3 w-96 h-96 rounded-2xl flex flex-col overflow-hidden opacity-0 invisible scale-95 transition-all duration-300 transform;
+}
+
+.chatbot-window.active {
+  @apply opacity-100 visible scale-100;
+}
+
+.chatbot-header {
+  @apply flex justify-between items-center p-4 border-b;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(212, 175, 55, 0.05));
+  border-color: var(--color-border-light);
+}
+
+.chatbot-messages {
+  @apply flex-1 overflow-y-auto p-4 flex flex-col gap-3;
+  background: rgba(10, 10, 15, 0.7);
+}
+
+.chat-message {
+  @apply rounded-xl px-4 py-2 max-w-[85%] text-sm transition-all duration-200;
+}
+
+.chat-message.user {
+  @apply ml-auto bg-[var(--color-primary)] text-[var(--color-bg-dark)] rounded-br-none;
+}
+
+.chat-message.bot {
+  @apply mr-auto bg-white/10 text-white rounded-bl-none;
+}
+
+.chat-message:hover {
+  @apply shadow-lg;
+}
+
+.chatbot-input-area {
+  @apply flex items-center gap-2 p-4 border-t;
+  border-color: var(--color-border-light);
+  background: rgba(10, 10, 15, 0.7);
 }

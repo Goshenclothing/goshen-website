@@ -25,21 +25,23 @@ export default function Collections() {
                 .order('created_at', { ascending: true });
 
             if (error) {
-                console.error('[Collections] Supabase error:', error);
-                throw error;
-            }
-            
-            if (!data) {
-                console.warn('[Collections] No data returned from query');
+                console.error('[Collections] Supabase error:', error.message || error);
+                // Gracefully handle error - show empty state
                 setCollections([]);
                 return;
             }
             
-            setCollections(data || []);
+            if (!data || data.length === 0) {
+                console.info('[Collections] No collections available');
+                setCollections([]);
+                return;
+            }
+            
+            setCollections(data);
         } catch (error) {
-            const err = error instanceof Error ? error : new Error(String(error));
-            console.error('[Collections] Failed to fetch:', err.message);
-            setCollections([]); // Gracefully degrade to empty state
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            console.error('[Collections] Error:', errorMessage);
+            setCollections([]);
         } finally {
             setIsLoading(false);
         }

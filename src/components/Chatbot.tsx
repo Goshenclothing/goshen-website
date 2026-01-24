@@ -25,7 +25,7 @@ export default function Chatbot() {
     const { isAdminMode } = useAdmin();
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([
-        { role: 'bot', text: "Hello! I'm your Goshen assistant. Ask me about our collections, luxury kimonos, or styling advice." }
+        { role: 'bot', text: "Hello! I'm your Goshen assistant. Ask me about our collections, luxury fashion, or styling advice." }
     ]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -117,14 +117,14 @@ export default function Chatbot() {
             setMessages(prev => [...prev, { role: 'bot', text: response.data.text }]);
         } catch (error) {
             const errorMsg = error instanceof Error ? error.message : String(error);
-            let errorText = "I'm having trouble connecting. Please try again! ✨";
+            let errorText = "I'm having trouble connecting. Please try again!";
             
             if (errorMsg.includes('timeout') || errorMsg.includes('504')) {
-                errorText = "That took too long. Please try a shorter message. ⏱️";
+                errorText = "That took too long. Please try a shorter message.";
             } else if (errorMsg.includes('503')) {
-                errorText = "AI service is temporarily unavailable. Please try again later. 🔄";
+                errorText = "AI service is temporarily unavailable. Please try again later.";
             } else if (isAdminMode) {
-                errorText = `⚠️ ADMIN: ${errorMsg}`;
+                errorText = `Error: ${errorMsg}`;
             }
 
             setMessages(prev => [...prev, { role: 'bot', text: errorText }]);

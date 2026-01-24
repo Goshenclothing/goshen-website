@@ -52,21 +52,23 @@ export default function Products() {
                 .limit(8);
 
             if (error) {
-                console.error('[Products] Supabase error:', error);
-                throw error;
-            }
-            
-            if (!data) {
-                console.warn('[Products] No data returned from query');
+                console.error('[Products] Error fetching:', error.message || error);
+                // Gracefully handle error - show empty state
                 setProducts([]);
                 return;
             }
             
-            setProducts(data || []);
+            if (!data || data.length === 0) {
+                console.info('[Products] No products available');
+                setProducts([]);
+                return;
+            }
+            
+            setProducts(data);
         } catch (error) {
-            const err = error instanceof Error ? error : new Error(String(error));
-            console.error('[Products] Failed to fetch:', err.message);
-            setProducts([]); // Gracefully degrade to empty state
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            console.error('[Products] Error:', errorMessage);
+            setProducts([]);
         } finally {
             setIsLoading(false);
         }

@@ -67,9 +67,10 @@ export default function ProductManager() {
                 throw prodError;
             }
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const formattedProducts = prodData?.map((p: any) => ({
                 ...p,
-                collection_title: p.collections?.title
+                collection_title: p.collections?.[0]?.title
             })) || [];
 
             setProducts(formattedProducts);

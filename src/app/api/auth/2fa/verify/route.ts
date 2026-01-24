@@ -1,4 +1,4 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
@@ -87,8 +87,9 @@ export async function POST(req: Request) {
             }, { status: 400 });
         }
 
-    } catch (err: any) {
-        console.error('2FA Verify Error:', err);
-        return NextResponse.json({ error: err.message || 'Verification failed.' }, { status: 500 });
+    } catch (err) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        console.error('2FA Verify Error:', error);
+        return NextResponse.json({ error: error.message || 'Verification failed.' }, { status: 500 });
     }
 }

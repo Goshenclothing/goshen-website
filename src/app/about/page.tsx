@@ -49,7 +49,7 @@ export default function AboutPage() {
                     <div>
                         <h2 className="text-4xl font-playfair mb-6">Our Mission</h2>
                         <p className="text-white/80 text-lg leading-relaxed mb-4">
-                            At Goshen Clothing, we believe that fashion is more than fabric and stitches—it's a form of cultural expression and personal empowerment.
+                            At Goshen Clothing, we believe that fashion is more than fabric and stitches&mdash;it&rsquo;s a form of cultural expression and personal empowerment.
                         </p>
                         <p className="text-white/80 text-lg leading-relaxed">
                             Our mission is to preserve African heritage, celebrate individual expression, support artisanal excellence, and bridge cultures through authentic fashion.
@@ -222,7 +222,7 @@ export default function AboutPage() {
                     Experience African Excellence
                 </h2>
                 <p className="text-xl text-white/70 mb-10 max-w-2xl mx-auto">
-                    When you wear Goshen, you're carrying stories, supporting artisans, celebrating heritage, and making a statement about the beauty of African fashion.
+                    When you wear Goshen, you&rsquo;re carrying stories, supporting artisans, celebrating heritage, and making a statement about the beauty of African fashion.
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-6 justify-center">

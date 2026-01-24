@@ -1,10 +1,9 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import crypto from 'crypto';
 import { EmailService } from '@/lib/emailService';
 
-export async function POST(req: Request) {
+export async function POST() {
     try {
         const cookieStore = await cookies();
         const supabase = createServerClient(
@@ -72,8 +71,9 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ message: 'A 4-digit PIN has been sent to your email.' });
 
-    } catch (err: any) {
-        console.error('2FA Send Error:', err);
-        return NextResponse.json({ error: err.message || 'Failed to send 2FA PIN.' }, { status: 500 });
+    } catch (err) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        console.error('2FA Send Error:', error);
+        return NextResponse.json({ error: error.message || 'Failed to send 2FA PIN.' }, { status: 500 });
     }
 }

@@ -9,12 +9,10 @@ import {
     MessageSquare,
     Settings,
     LogOut,
-    Plus,
     Sparkles,
     BarChart3,
     Users
 } from 'lucide-react';
-import Link from 'next/link';
 import AdminAIChat from '@/components/AdminAIChat';
 import ProductManager from '@/components/ProductManager';
 import CollectionManager from '@/components/CollectionManager';

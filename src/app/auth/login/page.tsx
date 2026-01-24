@@ -61,8 +61,9 @@ export default function LoginPage() {
                 // Success - redirect to 2FA verification
                 router.push('/auth/2fa');
             }
-        } catch (err: any) {
-            setError(err.message || 'Invalid email or password.');
+        } catch (err) {
+            const error = err instanceof Error ? err : new Error(String(err));
+            setError(error.message || 'Invalid email or password.');
         } finally {
             setLoading(false);
         }
@@ -76,7 +77,7 @@ export default function LoginPage() {
                     redirectTo: `${window.location.origin}/auth/callback`,
                 },
             });
-        } catch (err: any) {
+        } catch (err) {
             setError('Google login is temporarily unavailable. Please try again.');
         }
     };

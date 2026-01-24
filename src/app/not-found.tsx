@@ -13,7 +13,7 @@ export default function NotFound() {
                     </h1>
                     <h2 className="text-3xl font-bold text-white mb-3">Page Not Found</h2>
                     <p className="text-[var(--color-text-subtle)]">
-                        The page you're looking for doesn't exist or has been moved. Let's get you back on track.
+                        The page you&rsquo;re looking for doesn&rsquo;t exist or has been moved. Let&rsquo;s get you back on track.
                     </p>
                 </div>
 

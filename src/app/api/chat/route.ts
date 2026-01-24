@@ -66,7 +66,11 @@ export async function POST(req: NextRequest): Promise<NextResponse<ChatResponse>
         }
 
         // Normalize history to Gemini format
-        const history = messages.slice(0, -1).map((m: any) => ({
+        interface MessageParam {
+            role: string;
+            text: string;
+        }
+        const history = messages.slice(0, -1).map((m: MessageParam) => ({
             role: m.role === 'user' ? 'user' : 'model',
             parts: [{ text: m.text }]
         }));
@@ -92,6 +96,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<ChatResponse>
         try {
             if (imageData) {
                 // If image is provided, we send a multimodal message
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const parts: any[] = [{ text: lastMessage }];
 
                 if (imageData.startsWith('data:')) {
@@ -115,12 +120,13 @@ export async function POST(req: NextRequest): Promise<NextResponse<ChatResponse>
 
         const responseText = result.response.text();
         return NextResponse.json({ text: responseText }, { status: 200 });
-    } catch (error: any) {
-        const errorMessage = error?.message || String(error);
+    } catch (error) {
+        const err = error as Error & { name?: string };
+        const errorMessage = err?.message || String(error);
         console.error("[Chat API]", errorMessage);
         
         // Handle timeout specifically
-        if (error?.name === 'AbortError') {
+        if (err?.name === 'AbortError') {
             return NextResponse.json(
                 { error: 'Request took too long. Please try a shorter message.' },
                 { status: 504 }

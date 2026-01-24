@@ -45,8 +45,9 @@ export default function SignupPage() {
                 // Since we implemented a trigger in DB, profile will be created automatically.
                 router.push('/auth/login?message=Check your email to confirm your account.');
             }
-        } catch (err: any) {
-            setError(err.message || 'An error occurred during signup.');
+        } catch (err) {
+            const error = err instanceof Error ? err : new Error(String(err));
+            setError(error.message || 'An error occurred during signup.');
         } finally {
             setLoading(false);
         }

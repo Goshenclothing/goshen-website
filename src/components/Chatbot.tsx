@@ -7,13 +7,10 @@ import {
     Send,
     Image as ImageIcon,
     X,
-    MessageSquare,
-    RefreshCcw,
     Loader2,
     Camera,
     Sparkles
 } from 'lucide-react';
-import NextImage from 'next/image';
 
 type Message = {
     role: string;

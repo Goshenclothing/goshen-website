@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { createBrowserClient } from '@supabase/ssr';
 import { ShieldCheck, ArrowRight, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 import { useUserAuth } from '@/context/UserAuthContext';
@@ -14,7 +13,7 @@ export default function TwoFactorPage() {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
     const router = useRouter();
-    const { user, refreshSession, set2FAComplete, signOut } = useUserAuth();
+    const { user, set2FAComplete, signOut } = useUserAuth();
     const inputRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
 
     const supabase = createBrowserClient(
@@ -34,7 +33,7 @@ export default function TwoFactorPage() {
 
         // Trigger the first PIN send
         sendPin();
-    }, [user]);
+    }, [user, router]);
 
     const sendPin = async () => {
         setSending(true);
@@ -43,8 +42,9 @@ export default function TwoFactorPage() {
             const res = await fetch('/api/auth/2fa/send', { method: 'POST' });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Failed to send PIN.');
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err) {
+            const error = err instanceof Error ? err : new Error(String(err));
+            setError(error.message);
         } finally {
             setSending(false);
         }
@@ -90,8 +90,9 @@ export default function TwoFactorPage() {
             setSuccess(true);
             set2FAComplete(true);
             router.push('/account');
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err) {
+            const error = err instanceof Error ? err : new Error(String(err));
+            setError(error.message);
             setPin(['', '', '', '']);
             inputRefs[0].current?.focus();
         } finally {

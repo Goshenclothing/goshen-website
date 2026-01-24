@@ -9,7 +9,15 @@ import EditableImage from './EditableImage';
 import { Loader2 } from 'lucide-react';
 
 export default function Collections() {
-    const [collections, setCollections] = useState<any[]>([]);
+    interface Collection {
+        id: string;
+        title: string;
+        image_path: string;
+        description?: string;
+        created_at?: string;
+        count_text?: string;
+    }
+    const [collections, setCollections] = useState<Collection[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -91,7 +99,7 @@ export default function Collections() {
                                             <EditableText id={`collection-title-${c.id}`} defaultValue={c.title} />
                                         </h3>
                                         <div className="collection-count">
-                                            <EditableText id={`collection-count-${c.id}`} defaultValue={c.count_text} />
+                                            <EditableText id={`collection-count-${c.id}`} defaultValue={c.count_text || ''} />
                                         </div>
                                         <span className="mt-4 text-[10px] font-bold tracking-widest uppercase text-[var(--color-primary)] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2">
                                             Open Lookbook

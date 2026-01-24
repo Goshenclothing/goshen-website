@@ -28,8 +28,9 @@ export default function ForgotPasswordPage() {
 
             if (resetError) throw resetError;
             setSuccess(true);
-        } catch (err: any) {
-            setError(err.message || 'Failed to send reset email.');
+        } catch (err) {
+            const error = err instanceof Error ? err : new Error(String(err));
+            setError(error.message || 'Failed to send reset email.');
         } finally {
             setLoading(false);
         }
@@ -55,7 +56,7 @@ export default function ForgotPasswordPage() {
                                 <CheckCircle2 className="w-6 h-6" />
                             </div>
                             <h3 className="text-xl font-bold mb-2">Check your inbox</h3>
-                            <p className="text-[var(--color-text-subtle)] mb-6">We've sent a password reset link to <span className="text-[var(--color-primary)]">{email}</span></p>
+                            <p className="text-[var(--color-text-subtle)] mb-6">We&rsquo;ve sent a password reset link to <span className="text-[var(--color-primary)]">{email}</span></p>
                             <Link href="/auth/login" className="text-[var(--color-primary)] font-bold hover:underline">
                                 Back to Login
                             </Link>

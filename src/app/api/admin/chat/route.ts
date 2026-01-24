@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextResponse } from 'next/server';
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
@@ -67,7 +67,11 @@ export async function POST(req: Request) {
         });
 
         // Convert messages to Gemini format
-        const history = messages.slice(0, -1).map((m: any) => ({
+        interface MessageParam {
+            role: string;
+            text: string;
+        }
+        const history = messages.slice(0, -1).map((m: MessageParam) => ({
             role: m.role === 'admin' ? 'user' : 'model',
             parts: [{ text: m.text }],
         }));
@@ -96,11 +100,12 @@ export async function POST(req: Request) {
         const responseText = result.response.text();
 
         return NextResponse.json({ text: responseText }, { status: 200 });
-    } catch (error: any) {
-        console.error('Admin API Error:', error);
+    } catch (error) {
+        const err = error as Error & { name?: string };
+        console.error('Admin API Error:', err);
 
         // Handle timeout specifically
-        if (error.name === 'AbortError') {
+        if (err.name === 'AbortError') {
             return NextResponse.json(
                 { error: 'Request took too long. Please try a shorter message.' },
                 { status: 504 }

@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -11,19 +11,36 @@ import EditableImage from '@/components/EditableImage';
 import { supabase } from '@/lib/supabase';
 import { Loader2, ArrowLeft } from 'lucide-react';
 
+interface CollectionData {
+    id: string;
+    title: string;
+    image_path: string;
+    description?: string;
+}
+
+interface Product {
+    id: string;
+    name: string;
+    image_path: string;
+    description?: string;
+    collection_id?: string;
+    collection_title?: string;
+    tag?: string;
+}
+
 export default function CollectionPage() {
     const params = useParams();
     const id = params.id as string;
 
-    const [collection, setCollection] = useState<any>(null);
-    const [products, setProducts] = useState<any[]>([]);
+    const [collection, setCollection] = useState<CollectionData | null>(null);
+    const [products, setProducts] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         if (id) fetchCollectionData();
     }, [id]);
 
-    const fetchCollectionData = async () => {
+    const fetchCollectionData = useCallback(async () => {
         setIsLoading(true);
         try {
             // Fetch collection details
@@ -49,7 +66,7 @@ export default function CollectionPage() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [id]);
 
     if (isLoading) {
         return (
@@ -63,7 +80,7 @@ export default function CollectionPage() {
         return (
             <div className="min-h-screen bg-[var(--color-bg-dark)] flex flex-col items-center justify-center p-4 text-center">
                 <h2 className="text-3xl font-bold mb-4">Album Not Found</h2>
-                <p className="text-[var(--color-text-subtle)] mb-8">The collection you are looking for doesn't exist or has been moved.</p>
+                <p className="text-[var(--color-text-subtle)] mb-8">The collection you are looking for doesn&rsquo;t exist or has been moved.</p>
                 <Link href="/#collections" className="btn btn-primary">Back to Home</Link>
             </div>
         );
@@ -109,7 +126,7 @@ export default function CollectionPage() {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
-                            {products.map((item: any, idx: number) => (
+                            {products.map((item: Product, idx: number) => (
                                 <motion.div
                                     key={item.id}
                                     className="group relative"

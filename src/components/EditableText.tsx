@@ -53,15 +53,16 @@ export default function EditableText({ id, defaultValue, tagName: Tag = 'span', 
                     if (error) throw error;
                     console.log(`Synced collection ${dbId} ${dbField} to database.`);
                 }
-            } catch (err: any) {
-                console.error('Failed to sync change to database:', err);
+            } catch (err) {
+                const error = err instanceof Error ? err : new Error(String(err));
+                console.error('Failed to sync change to database:', error);
                 alert('Connection error: Changes saved locally but failed to sync with the server. Please check your connection and refresh.');
             }
         }
     };
 
-    // Cast Tag to any to avoid "complex union type" error with dynamic tags
-    const Component = Tag as any;
+    // Cast Tag as React component to avoid "complex union type" error with dynamic tags
+    const Component = Tag as React.ElementType;
 
     return (
         <Component

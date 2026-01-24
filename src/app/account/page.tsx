@@ -15,7 +15,6 @@ import {
     MapPin,
     CreditCard
 } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 export default function AccountDashboard() {
     const { user, signOut, loading, is2FAComplete } = useUserAuth();

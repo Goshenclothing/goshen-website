@@ -16,7 +16,8 @@ export default function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [theme, setTheme] = useState<'default' | 'light' | 'dark'>(() => {
         if (typeof window !== 'undefined') {
-            return (localStorage.getItem('goshen-theme') as any) || 'default';
+            const stored = localStorage.getItem('goshen-theme') as 'default' | 'light' | 'dark' | null;
+            return stored || 'default';
         }
         return 'default';
     });
@@ -40,7 +41,7 @@ export default function Navbar() {
 
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+    }, [theme]);
 
 
 

@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useUserAuth } from '@/context/UserAuthContext';
 import { createBrowserClient } from '@supabase/ssr';
 import {
@@ -26,7 +26,7 @@ export default function ProfilePage() {
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [message, setMessage] = useState<string | null>(null);
-    const [profileData, setProfileData] = useState<any>(null);
+    const [profileData, setProfileData] = useState<{full_name?: string; phone?: string; avatar_url?: string} | null>(null);
 
     const supabase = createBrowserClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -39,7 +39,7 @@ export default function ProfilePage() {
         }
     }, [user]);
 
-    const fetchProfile = async () => {
+    const fetchProfile = useCallback(async () => {
         if (!user?.id) {
             setError('No user found');
             return;
@@ -61,7 +61,7 @@ export default function ProfilePage() {
             setFullName(data.full_name || '');
             setPhone(data.phone || '');
         }
-    };
+    }, [user?.id, supabase]);
 
     const handleUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -93,8 +93,9 @@ export default function ProfilePage() {
 
             setMessage('Profile updated successfully!');
             await refreshSession();
-        } catch (err: any) {
-            setError(err.message || 'Failed to update profile.');
+        } catch (err) {
+            const error = err instanceof Error ? err : new Error(String(err));
+            setError(error.message || 'Failed to update profile.');
         } finally {
             setLoading(false);
         }
@@ -140,8 +141,9 @@ export default function ProfilePage() {
             setProfileData({ ...profileData, avatar_url: publicUrl });
             setMessage('Avatar updated successfully!');
             await refreshSession();
-        } catch (err: any) {
-            setError(err.message || 'Failed to upload avatar.');
+        } catch (err) {
+            const error = err instanceof Error ? err : new Error(String(err));
+            setError(error.message || 'Failed to upload avatar.');
         } finally {
             setUploading(false);
         }

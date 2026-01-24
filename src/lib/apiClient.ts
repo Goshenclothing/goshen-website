@@ -11,7 +11,7 @@ interface ApiResponse<T> {
 
 interface ApiRequestOptions {
     method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-    body?: any;
+    body?: Record<string, unknown>;
     timeout?: number;
     retries?: number;
 }
@@ -106,7 +106,7 @@ export async function apiGet<T>(
  */
 export async function apiPost<T>(
     endpoint: string,
-    body?: any,
+    body?: Record<string, unknown>,
     options?: Omit<ApiRequestOptions, 'method' | 'body'>
 ): Promise<ApiResponse<T>> {
     return apiRequest<T>(endpoint, { ...options, method: 'POST', body });
@@ -117,7 +117,7 @@ export async function apiPost<T>(
  */
 export async function apiPut<T>(
     endpoint: string,
-    body?: any,
+    body?: Record<string, unknown>,
     options?: Omit<ApiRequestOptions, 'method' | 'body'>
 ): Promise<ApiResponse<T>> {
     return apiRequest<T>(endpoint, { ...options, method: 'PUT', body });

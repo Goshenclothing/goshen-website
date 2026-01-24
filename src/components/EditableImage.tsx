@@ -36,12 +36,12 @@ export default function EditableImage({ id, defaultSrc, alt, className = '' }: E
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = 'image/*';
-            input.onchange = (e: any) => {
-                const file = e.target.files[0];
+            input.onchange = (e: Event) => {
+                const file = (e.target as HTMLInputElement).files?.[0];
                 if (file) {
                     const reader = new FileReader();
-                    reader.onload = (ev: any) => {
-                        const dataUrl = ev.target.result;
+                    reader.onload = (ev: ProgressEvent<FileReader>) => {
+                        const dataUrl = ev.target?.result as string;
                         setSrc(dataUrl);
                         localStorage.setItem(`goshen-image-${id}`, dataUrl);
                         alert("Image updated locally. For permanent storage, please use the Admin Dashboard File Manager.");
@@ -74,8 +74,9 @@ export default function EditableImage({ id, defaultSrc, alt, className = '' }: E
                         if (error) throw error;
                         console.log(`Synced ${table} ${dbId} image to database.`);
                     }
-                } catch (err: any) {
-                    console.error('Failed to sync image change:', err);
+                } catch (err) {
+                    const error = err instanceof Error ? err : new Error(String(err));
+                    console.error('Failed to sync image change:', error);
                     alert('Connection error: Changes saved locally but failed to sync with the server.');
                 } finally {
                     setIsSyncing(false);

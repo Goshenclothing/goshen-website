@@ -114,7 +114,7 @@ export default function Chatbot() {
                 throw new Error('No response from AI service');
             }
 
-            setMessages(prev => [...prev, { role: 'bot', text: response.data.text }]);
+            setMessages(prev => [...prev, { role: 'bot', text: response.data?.text ?? "I'm having trouble connecting. Please try again!" }]);
         } catch (error) {
             const errorMsg = error instanceof Error ? error.message : String(error);
             let errorText = "I'm having trouble connecting. Please try again!";

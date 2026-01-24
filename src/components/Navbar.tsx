@@ -66,6 +66,7 @@ export default function Navbar() {
                     <li><Link href="#home" onClick={() => setIsMobileMenuOpen(false)}>Home</Link></li>
                     <li><Link href="#products" onClick={() => setIsMobileMenuOpen(false)}>Products</Link></li>
                     <li><Link href="#collections" onClick={() => setIsMobileMenuOpen(false)}>Collections</Link></li>
+                    <li><Link href="/about" onClick={() => setIsMobileMenuOpen(false)}>About</Link></li>
                     <li><Link href="#reviews" onClick={() => setIsMobileMenuOpen(false)}>Reviews</Link></li>
                     <li><Link href="#contact" onClick={() => setIsMobileMenuOpen(false)}>Contact</Link></li>
                     {user && is2FAComplete ? (
